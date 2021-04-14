@@ -1,0 +1,39 @@
+---
+title: "BCO7000: Session  "
+subtitle: "⚔<br/>Session 5"
+author: "Dr Maria Prokofieva"
+institute: "VU Business School"
+date: "2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["shinobi", "ninjutsu"]
+    seal: true
+    self_contained: false
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false      
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE,   
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.height = 4,
+                      fig.width = 8,
+                      fig.align = "center")
+```
+background-image: url("img/bg.jpg")
+
+---
+# Well - let's warm  up ...
+
+In the center of the river, there lay 2 islands that were connected to each other and the river banks by 7 bridges.
+
+Is there a route that would allow someone to cross all 7 bridges without crossing any of them more than once?
+
+![](img/k3.jpg)
+---
