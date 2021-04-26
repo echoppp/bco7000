@@ -81,4 +81,3 @@ For all tables below, you need to use the RMarkdown functionality to present tab
 RMarkdown tutorial https://rmarkdown.rstudio.com/lesson-1.html
 
 ggplot2: Elegant Graphics for Data Analysis https://ggplot2-book.org/
-![image](https://user-images.githubusercontent.com/40324581/116080276-352ba200-a6dc-11eb-8a9d-127bc337b60b.png)
