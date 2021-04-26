@@ -1,1 +1,84 @@
 
+## Assessment 2
+
+### R libraries to use:
+
+- `ggplot2`
+
+- `tidyverse`
+
+### Dataset
+
+https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-11-20
+
+Tasks:
+
+See the definition of variables in a separate section “Data dictionary”
+
+To import the data use https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018-11-20/thanksgiving_meals.csv
+
+--------
+
+Setup: 5 marks
+
+1. Create a separate R Project for the assignment and call it “Practical assignment”. Please store all your files there.
+
+2. Use the provided csv file to complete the tasks below. The file needs to be uploaded to your project. You can use the variable name of your choice.
+
+3.  For each question below record your answer in the markdown document that will show the question, your code and the results.
+
+-----------
+
+### Part 1: formatting RMarkdown document  (10 marks)
+
+1. Create an Rmarkdown document with webpage as output (2 marks)
+
+2: At the start of the output document include your name in italic font and 
+your student id in bold font as level 2 heading (2 marks)
+
+Separate with a solid line (1 mark)
+
+Include the title “Assignment 1” as level 1 heading (1 mark)
+
+Separate with a solid line (1 mark)
+
+Include an photo of yourself (1 mark)
+
+3. List all tasks in the assignment as headings of the third level and include your results (=output) below each task showing your R code. (2 marks)
+
+### Part 2: Data Wrangling and visualization (60 Marks)
+
+For all tables below, you need to use the RMarkdown functionality to present tables (`kable`). 
+
+1. Display the first 10 rows of the dataset using RMarkdown (1 marks)
+
+2. Use `fct_reorder` and `parse_number` functions to create a factor variable `family_income`
+
+3. Generate the general statistics of the dataset using `summary()` and `skim()` function (2 mark).
+
+4. Wha is the number of people who celebrate?
+
+5. What are categories and stats for each main dish served and the method it is prepared?
+
+6. Create a data viz showing this in the most evident way. Provide your own legend and use themes.
+
+7. How many use cranberry sauce? How many use gravy?
+
+8. What is the distribution of those who celebrate across income ranges
+
+9. Present this information in the most evident way on the data viz.
+
+10. What are the most common pies, sides, and desserts?
+
+11. Present this information on a data viz
+
+13. How do the servings differ by income?
+
+14. Present this information on a data viz
+
+#### Resources:
+
+RMarkdown tutorial https://rmarkdown.rstudio.com/lesson-1.html
+
+ggplot2: Elegant Graphics for Data Analysis https://ggplot2-book.org/
+![image](https://user-images.githubusercontent.com/40324581/116080276-352ba200-a6dc-11eb-8a9d-127bc337b60b.png)
