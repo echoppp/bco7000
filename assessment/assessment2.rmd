@@ -3,8 +3,6 @@
 
 ### R libraries to use:
 
-- `ggplot2`
-
 - `tidyverse`
 
 ### Dataset
