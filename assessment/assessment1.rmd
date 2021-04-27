@@ -7,9 +7,11 @@
 
 
 
+
+
 ### Assessment 1.2
 
-**Focus**: ggplot2
+**Focus**: `tidyverse` data wrangling (adv) and `ggplot2`
 
 
 ### Assessment 1.3
