@@ -252,7 +252,7 @@ Do changes in the document using this [link as a guide](https://rmarkdown.rstudi
 
 ---
 
-# Resources
+# Resources 
 
 [Afterclass reading](https://r4ds.had.co.nz/r-markdown.html)
 [Intro](https://rmarkdown.rstudio.com/lesson-1.html)
