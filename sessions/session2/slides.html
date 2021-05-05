@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>BCO7000: Introduction to data wrangling and visualization</title>
+    <title>BCO7000: Session 2</title>
     <meta charset="utf-8" />
     <meta name="author" content="Dr Maria Prokofieva" />
-    <meta name="date" content="2021-01-01" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/shinobi.css" rel="stylesheet" />
     <link href="libs/remark-css/ninjutsu.css" rel="stylesheet" />
@@ -13,49 +12,326 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# BCO7000: Introduction to data wrangling and visualization
-## ⚔<br/>Session 2
+# BCO7000: Session 2
+## ⚔<br/>Introduction to Data Wrangling and Visualisation
 ### Dr Maria Prokofieva
 ### VU Business School
-### 2021
 
 ---
 
 
 
-background-image: url("sessions/session2/img/bg.jpg")
+
+# Plan for today
+
+- R refresher
+
+- Tidy data concept and visualization
+
+- Data and types of data
+
+- Data issues:  “noisy data”, “missing data”
+
+- Data wrangling
+
+- Finish Git/Github setup
 
 ---
-# Well - let's warm  up ...
+# Let's have a look at the data first
 
-In the center of the river, there lay 2 islands that were connected to each other and the river banks by 7 bridges.
+[TidyTuesday project](https://github.com/rfordatascience/tidytuesday)
 
-Is there a route that would allow someone to cross all 7 bridges without crossing any of them more than once?
+[Dataset](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-12-22/readme.md)
 
-![](img/k3.jpg)
+[csv file](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-12-22/big-mac.csv)
+
+We can load the dataset into our R using
+
+
+```r
+#don't forget that # is a comment
+
+library(tidyverse) 
+
+#let's create variable data and load our dataset
+
+data&lt;-read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-12-22/big-mac.csv')
+```
+
 ---
 
-# Key terms
+```r
+#look at first rows
 
-Data wrangling  
+data %&gt;% head()
+```
 
-Messy vs Tidy data
+```
+## # A tibble: 6 x 19
+##   date       iso_a3 currency_code name        local_price dollar_ex
+##   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;
+## 1 2000-04-01 ARG    ARS           Argentina          2.5       1   
+## 2 2000-04-01 AUS    AUD           Australia          2.59      1.68
+## 3 2000-04-01 BRA    BRL           Brazil             2.95      1.79
+## 4 2000-04-01 CAN    CAD           Canada             2.85      1.47
+## 5 2000-04-01 CHE    CHF           Switzerland        5.9       1.7 
+## 6 2000-04-01 CHL    CLP           Chile           1260       514   
+## # … with 13 more variables: dollar_price &lt;dbl&gt;, usd_raw &lt;dbl&gt;,
+## #   eur_raw &lt;dbl&gt;, gbp_raw &lt;dbl&gt;, jpy_raw &lt;dbl&gt;, cny_raw &lt;dbl&gt;,
+## #   gdp_dollar &lt;dbl&gt;, adj_price &lt;dbl&gt;, usd_adjusted &lt;dbl&gt;,
+## #   eur_adjusted &lt;dbl&gt;, gbp_adjusted &lt;dbl&gt;, jpy_adjusted &lt;dbl&gt;,
+## #   cny_adjusted &lt;dbl&gt;
+```
 
-Visualization  
+```r
+#let's have a look at one of the variables
 
-Types of dataviz 
+head(data$currency_code)
+```
 
-# Key R packages
+```
+## [1] "ARS" "AUD" "BRL" "CAD" "CHF" "CLP"
+```
+---
 
-- `tidyverse`
-    
-    - `ggplot2`
 
-        
+```r
+#let's store this variable in a separate variable
 
+currency&lt;-data$currency_code #note changes in the environment 
+
+head(currency)
+```
+
+```
+## [1] "ARS" "AUD" "BRL" "CAD" "CHF" "CLP"
+```
+
+```r
+#assign a new value
+currency&lt;-"AWESOME"
+
+#remove the new variable
+rm(currency)
+```
+
+---
+
+## All brilliant answers start with a question:
+
+Look at the dataset and think about questions that you can come up with
+---
+# Data and Data wrangling
+
+**Data wrangling** is the process of 
+
+- gathering, 
+
+- *selecting*, and 
+
+- *transforming* data 
+
+**to answer an analytical question**. 
+
+= data cleaning 
+
+= data “munging”
+
+Business analysts spend 80% of their time on this, and *ONLY* 20% for exploration and modeling.
+---
+# Data analysis workflow
+
+![](img/workflow.png)
+
+---
+# Datasets 
+
+Most statistical datasets are data frames made up of *rows* and *columns.* 
+
+The columns are almost always *labeled* and the rows are sometimes labeled.
+
+A **dataset** is a collection of **values**, e.g. numbers (if *quantitative*) or strings (if *qualitative*). 
+
+**Values** are organised in two ways:
+
+- Every value belongs to a *variable* and an *observation*.
+
+A *variable* contains all values that measure the same underlying attribute (like height, temperature, duration) across units. 
+
+An *observation* contains all values measured on the same unit (like a person, or a day, or a race) across attributes
+---
+
+# Tidy data concept
+
+**Tidy data** is a standard way of *mapping* the meaning of a dataset to its structure. 
+
+A dataset is *messy* or tidy depending on how rows, columns and tables are matched up with observations, variables and types. 
+
+In tidy data:
+
+- Every column is a variable.
+
+- Every row is an observation.
+
+- Every cell is a single value.
+
+![](img/tidydata.png)
+---
+#Tidying messy datasets
+
+Real datasets are messy
+
+Five most common problems with messy datasets:
+
+- Column headers are values, not variable names.
+
+- Multiple variables are stored in one column.
+
+- Variables are stored in both rows and columns.
+
+- Multiple types of observational units are stored in the same table.
+
+- A single observational unit is stored in multiple tables.
+
+---
+
+# Example: 
+
+
+```r
+messy_data&lt;-relig_income
+
+messy_data%&gt;%head()
+```
+
+```
+## # A tibble: 6 x 11
+##   religion      `&lt;$10k` `$10-20k` `$20-30k` `$30-40k` `$40-50k` `$50-75k`
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Agnostic           27        34        60        81        76       137
+## 2 Atheist            12        27        37        52        35        70
+## 3 Buddhist           27        21        30        34        33        58
+## 4 Catholic          418       617       732       670       638      1116
+## 5 Don’t know/r…      15        14        15        11        10        35
+## 6 Evangelical …     575       869      1064       982       881      1486
+## # … with 4 more variables: $75-100k &lt;dbl&gt;, $100-150k &lt;dbl&gt;, &gt;150k &lt;dbl&gt;,
+## #   Don't know/refused &lt;dbl&gt;
+```
+---
+
+
+```r
+relig_income %&gt;% 
+  pivot_longer(-religion, names_to = "income", values_to = "frequency")
+```
+
+```
+## # A tibble: 180 x 3
+##    religion income             frequency
+##    &lt;chr&gt;    &lt;chr&gt;                  &lt;dbl&gt;
+##  1 Agnostic &lt;$10k                     27
+##  2 Agnostic $10-20k                   34
+##  3 Agnostic $20-30k                   60
+##  4 Agnostic $30-40k                   81
+##  5 Agnostic $40-50k                   76
+##  6 Agnostic $50-75k                  137
+##  7 Agnostic $75-100k                 122
+##  8 Agnostic $100-150k                109
+##  9 Agnostic &gt;150k                     84
+## 10 Agnostic Don't know/refused        96
+## # … with 170 more rows
+```
+---
+
+# Data and types of data
+
+Data comes in different forms and shapes
+
+**Think about most common data formats you use?**
+
+Data repositories:
+
+- [Kaggle](https://www.kaggle.com/datasets)
+
+- [data.gov.au](https://data.gov.au/)
+
+- [TidyTuesday project](https://github.com/rfordatascience/tidytuesday)
+
+- [Makeover Monday](https://www.makeovermonday.co.uk/data/)
+
+---
+# Visualization in the current world
+
+A picture is worth a thousand words
+
+It is all started with [this video](https://www.youtube.com/watch?v=hVimVzgtD6w)
+
+*Can we have a look?*
+
+Gapminder case study 
+
+https://www.gapminder.org/tools/#$chart-type=bubbles
+
+Another [example](https://bing.com/covid)
+
+Get practice: [MakeOver Monday](https://www.makeovermonday.co.uk/)
+and learn from [others](https://twitter.com/search?q=makeovermonday&amp;src=typeahead_click)
+
+---
+# RMarkdown
+
+*Markdown* (vs RMarkdown) is a way to create formatted text using a plain-text editor.
+
+It is a VERY WELL established format in the industry and used VERY widely.
+
+*R Markdown* is the next level that allows to combine markdown with R code.
+
+This allows to combining your code, its results, and your text/graphics commentary. 
+
+R Markdown files (.rmd vs .r for R scripts) can be used in three ways:
+
+- For communicating to decision makers, who want to focus on the conclusions, not the code behind the analysis.
+
+- For collaborating with other business analysts, who are interested in both your conclusions, and how you analysed your data (i.e. the code).
+
+- As a notebook for yourself where you can record your code and your reflections.
+---
+# Practice
+
+Let's create a RMarkdown document in R and study it
+
+The document contains three important types of content:
+
+- A meta information (YAML header) surrounded by ---s.
+
+- Chunks of R code surrounded by ```.
+
+-Text mixed with simple text formatting like # heading and _italics_.
+
+---
+# RMarkdown basics
+
+Study the generated default .rmd file and identify relevant parts.
+
+Do changes in the document using this [link as a guide](https://rmarkdown.rstudio.com/lesson-8.html)
+
+---
+
+# Resources
+
+[Afterclass reading](https://r4ds.had.co.nz/r-markdown.html)
+[Intro](https://rmarkdown.rstudio.com/lesson-1.html)
+
+[Cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+
+[R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+
+---
+# Finish Git/Github setup
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",
