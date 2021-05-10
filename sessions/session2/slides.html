@@ -68,19 +68,18 @@ data %&gt;% head()
 
 ```
 ## # A tibble: 6 x 19
-##   date       iso_a3 currency_code name        local_price dollar_ex
-##   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;
-## 1 2000-04-01 ARG    ARS           Argentina          2.5       1   
-## 2 2000-04-01 AUS    AUD           Australia          2.59      1.68
-## 3 2000-04-01 BRA    BRL           Brazil             2.95      1.79
-## 4 2000-04-01 CAN    CAD           Canada             2.85      1.47
-## 5 2000-04-01 CHE    CHF           Switzerland        5.9       1.7 
-## 6 2000-04-01 CHL    CLP           Chile           1260       514   
-## # … with 13 more variables: dollar_price &lt;dbl&gt;, usd_raw &lt;dbl&gt;,
-## #   eur_raw &lt;dbl&gt;, gbp_raw &lt;dbl&gt;, jpy_raw &lt;dbl&gt;, cny_raw &lt;dbl&gt;,
-## #   gdp_dollar &lt;dbl&gt;, adj_price &lt;dbl&gt;, usd_adjusted &lt;dbl&gt;,
-## #   eur_adjusted &lt;dbl&gt;, gbp_adjusted &lt;dbl&gt;, jpy_adjusted &lt;dbl&gt;,
-## #   cny_adjusted &lt;dbl&gt;
+##   date       iso_a3 currency_code name        local_price dollar_ex dollar_price
+##   &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;
+## 1 2000-04-01 ARG    ARS           Argentina          2.5       1            2.5 
+## 2 2000-04-01 AUS    AUD           Australia          2.59      1.68         1.54
+## 3 2000-04-01 BRA    BRL           Brazil             2.95      1.79         1.65
+## 4 2000-04-01 CAN    CAD           Canada             2.85      1.47         1.94
+## 5 2000-04-01 CHE    CHF           Switzerland        5.9       1.7          3.47
+## 6 2000-04-01 CHL    CLP           Chile           1260       514            2.45
+## # … with 12 more variables: usd_raw &lt;dbl&gt;, eur_raw &lt;dbl&gt;, gbp_raw &lt;dbl&gt;,
+## #   jpy_raw &lt;dbl&gt;, cny_raw &lt;dbl&gt;, gdp_dollar &lt;dbl&gt;, adj_price &lt;dbl&gt;,
+## #   usd_adjusted &lt;dbl&gt;, eur_adjusted &lt;dbl&gt;, gbp_adjusted &lt;dbl&gt;,
+## #   jpy_adjusted &lt;dbl&gt;, cny_adjusted &lt;dbl&gt;
 ```
 
 ```r
@@ -206,15 +205,15 @@ messy_data%&gt;%head()
 
 ```
 ## # A tibble: 6 x 11
-##   religion      `&lt;$10k` `$10-20k` `$20-30k` `$30-40k` `$40-50k` `$50-75k`
-##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Agnostic           27        34        60        81        76       137
-## 2 Atheist            12        27        37        52        35        70
-## 3 Buddhist           27        21        30        34        33        58
-## 4 Catholic          418       617       732       670       638      1116
-## 5 Don’t know/r…      15        14        15        11        10        35
-## 6 Evangelical …     575       869      1064       982       881      1486
-## # … with 4 more variables: $75-100k &lt;dbl&gt;, $100-150k &lt;dbl&gt;, &gt;150k &lt;dbl&gt;,
+##   religion  `&lt;$10k` `$10-20k` `$20-30k` `$30-40k` `$40-50k` `$50-75k` `$75-100k`
+##   &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 Agnostic       27        34        60        81        76       137        122
+## 2 Atheist        12        27        37        52        35        70         73
+## 3 Buddhist       27        21        30        34        33        58         62
+## 4 Catholic      418       617       732       670       638      1116        949
+## 5 Don’t kn…      15        14        15        11        10        35         21
+## 6 Evangeli…     575       869      1064       982       881      1486        949
+## # … with 3 more variables: $100-150k &lt;dbl&gt;, &gt;150k &lt;dbl&gt;,
 ## #   Don't know/refused &lt;dbl&gt;
 ```
 ---
