@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BCO7000: Session 3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr Maria Prokofieva" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/shinobi.css" rel="stylesheet" />
+    <link href="libs/remark-css/ninjutsu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# BCO7000: Session 3
+## Data Wrangling and introduction to visualization
+### Dr Maria Prokofieva
+### VU Business School
+
+---
+
+
+
+#Plan for today
+
+- R/RMarkdown refressher
+
+- Data wrangling
+
+- `tidyverse`: Basic functions for data wrangling 
+
+- Tidy format
+
+- How to make you data tidy
+
+### It is not a programming unit! We concentrate on **DATA**!!!
+
+---
+
+#R/RMarkdown refresher
+
+- Use the project which we created in session 1
+
+- create a new RMarkdown document
+
+- locate 3 sections in Rmarkdown: meta data, text/graph/ R chunks
+
+- remove the canned text/graphs and R chunks
+
+- load the package `tidyverse` in the R chunks: How do we do it?
+
+- load the data using the variable `mac_index`. Use the same data: `https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-12-22/big-mac.csv`
+How do we do it?
+
+- write a sentence with the narration describing the dataset: where do we write this?
+
+- in your narration use *italics* and **bold** fonts
+
+- in the R chunks present the first 6 observations from the dataset: How do we do it?
+
+- create a new variable and save one of the variables from the dataset. How do we do it?
+
+*Don't forget that your R code should go into the R chunk
+
+**What is the correct syntax for a R chunk?**
+
+---
+
+Let's load the same dataset as we started working on last time:
+
+
+```r
+#don't forget that # is a comment
+
+library(tidyverse) 
+
+#let's create variable data and load our dataset
+
+data&lt;-read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-12-22/big-mac.csv')
+```
+Is this data in tidy format?
+
+## What kind of questions we can ask?
+
+---
+#Data wrangling
+
+or **data munging**
+
+is the process of transforming and mapping data from one *"raw"* data form into another format to make it more appropriate and valuable for further processing.
+
+![ ](img/workflow.png)
+---
+#Data wrangling in R `tidyverse` 
+
+Library `tidyverse` [https://www.tidyverse.org/](https://www.tidyverse.org/)
+
+Is a collection of packages to work with data preparation
+
+There are many other packages that you can use and you can find them at CRAN `The Comprehensive R Archive Network` https://cran.r-project.org/
+
+We may not use individual packages from `tidyverse` and just reference the whole package `library(tidyverse)`.
+
+### Make sure that you install the package before **first** use
+
+![ ](img/tidyverse.jpeg)
+
+---
+#Updated workflow
+
+With reference to individual packages in `tidyverse` universe:
+
+You can review documentation about each package here https://www.tidyverse.org/ 
+
+![ ](img/workflow2.png)
+---
+#Install `tidyverse`
+
+We did this in our first session!
+
+Do we need to install packages (`install.packages()`) everytime we use them?
+
+Do we need load packages (`library ()`) everytime we use them? 
+
+or at the start of the session?
+
+
+```r
+#Step 1
+install.packages("tidyverse") #run only ONCE to install!
+
+#Step 2
+library(tidyverse) #run in every file that uses tidyverse functions
+```
+
+`tidyverse` is a collection of packages combined to help with data wrangling
+More help is at https://www.tidyverse.org/ 
+---
+
+#Data import
+## Sources of data:
+
+- Flat files (e.g.csv and xls)
+
+`data&lt;-read_csv(file="path\name_of_file.csv")` 
+
+`write_csv(data, file="path\name_of_file.csv")`
+
+Don't confuse with base R functions! They look similar!
+
+- "old"
+
+`read.csv()`
+`write.csv()`
+
+We can see the description of the functions in the `Help` tab in RStudio
+
+Examples?
+
+### What about other data formats?
+
+- `read_delim("text.txt", delim="|")` Read text files https://readr.tidyverse.org/reference/read_delim.html
+
+- `readxl()`: read Excel files. More info: https://readxl.tidyverse.org/
+
+Hint: see the cheatsheet for import functions here https://github.com/rstudio/cheatsheets/blob/master/data-import.pdf
+
+---
+
+Let's read another file
+
+This file is from `Kaggle` https://www.kaggle.com/neuromusic/avocado-prices
+
+You need to download this file from VUCollaborate to your working folder (=the one you use for your project).
+
+
+```r
+avocado&lt;-read_csv("avocado.csv")
+head(avocado)
+```
+
+```
+## # A tibble: 6 x 14
+##      X1 Date       AveragePrice `Total Volume` `4046` `4225` `4770` `Total Bags`
+##   &lt;dbl&gt; &lt;date&gt;            &lt;dbl&gt;          &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt;
+## 1     0 2015-12-27         1.33         64237.  1037. 5.45e4   48.2        8697.
+## 2     1 2015-12-20         1.35         54877.   674. 4.46e4   58.3        9506.
+## 3     2 2015-12-13         0.93        118220.   795. 1.09e5  130.         8145.
+## 4     3 2015-12-06         1.08         78992.  1132  7.20e4   72.6        5811.
+## 5     4 2015-11-29         1.28         51040.   941. 4.38e4   75.8        6184.
+## 6     5 2015-11-22         1.26         55980.  1184. 4.81e4   43.6        6684.
+## # … with 6 more variables: Small Bags &lt;dbl&gt;, Large Bags &lt;dbl&gt;,
+## #   XLarge Bags &lt;dbl&gt;, type &lt;chr&gt;, year &lt;dbl&gt;, region &lt;chr&gt;
+```
+
+### Have a look at the data and think about questions you want to solve with this data
+
+---
+#Piping
+
+**Reminder**
+
+Piping is a special symbol `%&gt;%` that allows you to "shuffle" your data from one step of processing to another set.
+
+As you see in the dataset, the names of the variables are not really 'tidy'. E.g. "Total volume" has a blank....
+
+How to make them tidy?
+
+
+---
+#Tidy data vs messy data
+.pull-left[
+
+```r
+table1
+```
+
+```
+## # A tibble: 6 x 4
+##   country      year  cases population
+##   &lt;chr&gt;       &lt;int&gt;  &lt;int&gt;      &lt;int&gt;
+## 1 Afghanistan  1999    745   19987071
+## 2 Afghanistan  2000   2666   20595360
+## 3 Brazil       1999  37737  172006362
+## 4 Brazil       2000  80488  174504898
+## 5 China        1999 212258 1272915272
+## 6 China        2000 213766 1280428583
+```
+
+```r
+table2
+```
+
+```
+## # A tibble: 12 x 4
+##    country      year type            count
+##    &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;           &lt;int&gt;
+##  1 Afghanistan  1999 cases             745
+##  2 Afghanistan  1999 population   19987071
+##  3 Afghanistan  2000 cases            2666
+##  4 Afghanistan  2000 population   20595360
+##  5 Brazil       1999 cases           37737
+##  6 Brazil       1999 population  172006362
+##  7 Brazil       2000 cases           80488
+##  8 Brazil       2000 population  174504898
+##  9 China        1999 cases          212258
+## 10 China        1999 population 1272915272
+## 11 China        2000 cases          213766
+## 12 China        2000 population 1280428583
+```
+]
+
+.pull-right[
+
+```r
+table3
+```
+
+```
+## # A tibble: 6 x 3
+##   country      year rate             
+## * &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;            
+## 1 Afghanistan  1999 745/19987071     
+## 2 Afghanistan  2000 2666/20595360    
+## 3 Brazil       1999 37737/172006362  
+## 4 Brazil       2000 80488/174504898  
+## 5 China        1999 212258/1272915272
+## 6 China        2000 213766/1280428583
+```
+
+```r
+table4a
+```
+
+```
+## # A tibble: 3 x 3
+##   country     `1999` `2000`
+## * &lt;chr&gt;        &lt;int&gt;  &lt;int&gt;
+## 1 Afghanistan    745   2666
+## 2 Brazil       37737  80488
+## 3 China       212258 213766
+```
+]
+---
+#Rules of tidy data:
+
+- Each variable must have its own column.
+- Each observation must have its own row.
+- Each value must have its own cell.
+
+What if my data is not tidy?
+
+*Use `tidyverse` to tidy it up!*
+
+![ ](img/tidydata.png)
+---
+#Basic functions to review
+
+- `glimpse()`
+- `top_n()`
+- `arrange()`
+- `filter()`
+- `select()`
+- `mutate()` and `transmute`
+- `separate()`
+- `group_by()`
+- `count()` and `add_count()`
+- `summarize`
+- `pivot_wide` vs `pivot_long`
+- `extract()`
+
+---
+# Application
+
+- [10 tidyverse tricks](https://www.youtube.com/watch?app=desktop&amp;v=NDHSBUN_rVU)
+
+- [Tidy Tuesday project](https://github.com/rfordatascience/tidytuesday)
+
+---
+# `glimpse()`
+
+have a look at the structure of the data
+
+
+```r
+avocado%&gt;%glimpse()
+```
+
+```
+## Rows: 18,249
+## Columns: 14
+## $ X1             &lt;dbl&gt; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1…
+## $ Date           &lt;date&gt; 2015-12-27, 2015-12-20, 2015-12-13, 2015-12-06, 2015-1…
+## $ AveragePrice   &lt;dbl&gt; 1.33, 1.35, 0.93, 1.08, 1.28, 1.26, 0.99, 0.98, 1.02, 1…
+## $ `Total Volume` &lt;dbl&gt; 64236.62, 54876.98, 118220.22, 78992.15, 51039.60, 5597…
+## $ `4046`         &lt;dbl&gt; 1036.74, 674.28, 794.70, 1132.00, 941.48, 1184.27, 1368…
+## $ `4225`         &lt;dbl&gt; 54454.85, 44638.81, 109149.67, 71976.41, 43838.39, 4806…
+## $ `4770`         &lt;dbl&gt; 48.16, 58.33, 130.50, 72.58, 75.78, 43.61, 93.26, 80.00…
+## $ `Total Bags`   &lt;dbl&gt; 8696.87, 9505.56, 8145.35, 5811.16, 6183.95, 6683.91, 8…
+## $ `Small Bags`   &lt;dbl&gt; 8603.62, 9408.07, 8042.21, 5677.40, 5986.26, 6556.47, 8…
+## $ `Large Bags`   &lt;dbl&gt; 93.25, 97.49, 103.14, 133.76, 197.69, 127.44, 122.05, 5…
+## $ `XLarge Bags`  &lt;dbl&gt; 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0…
+## $ type           &lt;chr&gt; "conventional", "conventional", "conventional", "conven…
+## $ year           &lt;dbl&gt; 2015, 2015, 2015, 2015, 2015, 2015, 2015, 2015, 2015, 2…
+## $ region         &lt;chr&gt; "Albany", "Albany", "Albany", "Albany", "Albany", "Alba…
+```
+---
+also useful package `skimr` and function `skim()`
+
+
+```r
+#install.packages("skimr")
+library(skimr)
+skim(avocado)
+```
+
+
+Table: Data summary
+
+|                         |        |
+|:------------------------|:-------|
+|Name                     |avocado |
+|Number of rows           |18249   |
+|Number of columns        |14      |
+|_______________________  |        |
+|Column type frequency:   |        |
+|character                |2       |
+|Date                     |1       |
+|numeric                  |11      |
+|________________________ |        |
+|Group variables          |None    |
+
+
+**Variable type: character**
+
+|skim_variable | n_missing| complete_rate| min| max| empty| n_unique| whitespace|
+|:-------------|---------:|-------------:|---:|---:|-----:|--------:|----------:|
+|type          |         0|             1|   7|  12|     0|        2|          0|
+|region        |         0|             1|   4|  19|     0|       54|          0|
+
+
+**Variable type: Date**
+
+|skim_variable | n_missing| complete_rate|min        |max        |median     | n_unique|
+|:-------------|---------:|-------------:|:----------|:----------|:----------|--------:|
+|Date          |         0|             1|2015-01-04 |2018-03-25 |2016-08-14 |      169|
+
+
+**Variable type: numeric**
+
+|skim_variable | n_missing| complete_rate|      mean|         sd|      p0|      p25|       p50|       p75|        p100|hist  |
+|:-------------|---------:|-------------:|---------:|----------:|-------:|--------:|---------:|---------:|-----------:|:-----|
+|X1            |         0|             1|     24.23|      15.48|    0.00|    10.00|     24.00|     38.00|       52.00|▇▆▆▆▆ |
+|AveragePrice  |         0|             1|      1.41|       0.40|    0.44|     1.10|      1.37|      1.66|        3.25|▂▇▅▁▁ |
+|Total Volume  |         0|             1| 850644.01| 3453545.36|   84.56| 10838.58| 107376.76| 432962.29| 62505646.52|▇▁▁▁▁ |
+|4046          |         0|             1| 293008.42| 1264989.08|    0.00|   854.07|   8645.30| 111020.20| 22743616.17|▇▁▁▁▁ |
+|4225          |         0|             1| 295154.57| 1204120.40|    0.00|  3008.78|  29061.02| 150206.86| 20470572.61|▇▁▁▁▁ |
+|4770          |         0|             1|  22839.74|  107464.07|    0.00|     0.00|    184.99|   6243.42|  2546439.11|▇▁▁▁▁ |
+|Total Bags    |         0|             1| 239639.20|  986242.40|    0.00|  5088.64|  39743.83| 110783.37| 19373134.37|▇▁▁▁▁ |
+|Small Bags    |         0|             1| 182194.69|  746178.51|    0.00|  2849.42|  26362.82|  83337.67| 13384586.80|▇▁▁▁▁ |
+|Large Bags    |         0|             1|  54338.09|  243965.96|    0.00|   127.47|   2647.71|  22029.25|  5719096.61|▇▁▁▁▁ |
+|XLarge Bags   |         0|             1|   3106.43|   17692.89|    0.00|     0.00|      0.00|    132.50|   551693.65|▇▁▁▁▁ |
+|year          |         0|             1|   2016.15|       0.94| 2015.00|  2015.00|   2016.00|   2017.00|     2018.00|▇▇▁▇▂ |
+---
+# Let's review the dataset closely - is it tidy enough?
+
+
+```r
+#install.packages("janitor")
+library(janitor)
+avocado&lt;-avocado%&gt;%clean_names()
+```
+
+How can we review the dataset to see changes that has been done?
+
+What has changed?
+
+Use Help to explore options other options in the `clean_names()` function
+
+
+```r
+?clean_names()
+```
+
+
+---
+# `filter()`
+
+select rows using a condition (=subsetting)
+
+
+```r
+avocado%&gt;%filter(average_price&gt;3)%&gt;%head()
+```
+
+```
+## # A tibble: 6 x 14
+##      x1 date       average_price total_volume x4046   x4225 x4770 total_bags
+##   &lt;dbl&gt; &lt;date&gt;             &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
+## 1    12 2016-10-02          3.03        3715.  297.  2700.     0        718.
+## 2     7 2016-11-06          3.12       19044. 5898. 10039.     0       3106.
+## 3     8 2016-10-30          3.25       16701. 2326. 11143.     0       3232.
+## 4    42 2017-03-12          3.05        2068. 1044.    77.4    0        947.
+## 5    18 2017-08-27          3.04       12656.  419.  4852.   145.      7240.
+## 6    37 2017-04-16          3.17        3019. 1256.    82.3    0       1681.
+## # … with 6 more variables: small_bags &lt;dbl&gt;, large_bags &lt;dbl&gt;,
+## #   x_large_bags &lt;dbl&gt;, type &lt;chr&gt;, year &lt;dbl&gt;, region &lt;chr&gt;
+```
+
+---
+# `filter()` with logical operators
+
+```r
+avocado%&gt;%filter(average_price&gt;2|region=="Seattle")%&gt;%head()
+```
+
+```
+## # A tibble: 6 x 14
+##      x1 date       average_price total_volume   x4046   x4225 x4770 total_bags
+##   &lt;dbl&gt; &lt;date&gt;             &lt;dbl&gt;        &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
+## 1     0 2015-12-27          1.09      450186. 101443. 178460. 7001.    163283.
+## 2     1 2015-12-20          1.15      404862.  88134. 139794. 6308.    170626.
+## 3     2 2015-12-13          1.05      454428. 114813. 156348. 9650.    173617.
+## 4     3 2015-12-06          0.81      726505. 117508. 219413. 9120.    380464.
+## 5     4 2015-11-29          1.17      373310.  90354. 131571. 9879.    141505.
+## 6     5 2015-11-22          1.07      426338. 111896. 155495. 9372.    149575.
+## # … with 6 more variables: small_bags &lt;dbl&gt;, large_bags &lt;dbl&gt;,
+## #   x_large_bags &lt;dbl&gt;, type &lt;chr&gt;, year &lt;dbl&gt;, region &lt;chr&gt;
+```
+---
+# `filter()` with logical operators
+
+![](img/transform-logical.png)
+---
+#`top_n()` and `arrange()`
+
+`arrange()` orders the rows of a data by the values of selected columns
+
+
+```r
+avocado %&gt;% 
+  arrange(average_price, total_volume)%&gt;%
+  head()
+```
+
+```
+## # A tibble: 6 x 14
+##      x1 date       average_price total_volume    x4046   x4225  x4770 total_bags
+##   &lt;dbl&gt; &lt;date&gt;             &lt;dbl&gt;        &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;
+## 1    43 2017-03-05          0.44       64057.     224.   4749.     0      59084.
+## 2    47 2017-02-05          0.46     2200550. 1200633. 531227. 18325.    450366.
+## 3    43 2017-03-05          0.48       50891.     718.   4139.     0      46034.
+## 4    44 2017-02-26          0.49       44024.     253.   4473.     0      39299.
+## 5     0 2015-12-27          0.49     1137707.  738315. 286858. 11642.    100892.
+## 6    43 2017-03-05          0.51       17135.     482.   1790.     0      14863.
+## # … with 6 more variables: small_bags &lt;dbl&gt;, large_bags &lt;dbl&gt;,
+## #   x_large_bags &lt;dbl&gt;, type &lt;chr&gt;, year &lt;dbl&gt;, region &lt;chr&gt;
+```
+
+Study Help and see how you can arrange values in the descending order
+
+---
+# Select columns with `select()`
+
+
+
+```r
+avocado%&gt;%
+  select(date, average_price, total_volume, total_bags)
+```
+
+```
+## # A tibble: 18,249 x 4
+##    date       average_price total_volume total_bags
+##    &lt;date&gt;             &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
+##  1 2015-12-27          1.33       64237.      8697.
+##  2 2015-12-20          1.35       54877.      9506.
+##  3 2015-12-13          0.93      118220.      8145.
+##  4 2015-12-06          1.08       78992.      5811.
+##  5 2015-11-29          1.28       51040.      6184.
+##  6 2015-11-22          1.26       55980.      6684.
+##  7 2015-11-15          0.99       83454.      8319.
+##  8 2015-11-08          0.98      109428.      6829.
+##  9 2015-11-01          1.02       99811.     11388.
+## 10 2015-10-25          1.07       74339.      8626.
+## # … with 18,239 more rows
+```
+
+Study Help: what is the effect of using `-` in the list of variables?
+
+What do these options do?
+
+- `starts_with("abc")`
+
+- `ends_with("xyz")`
+
+- `contains("ijk")`
+---
+
+# `rename()` rename variables
+
+Study Help and see how you can rename `region` variable into `country`
+
+---
+# `mutate()` and `transmute` to add variables
+
+`mutate()` always adds new columns at the end of your dataset
+
+
+
+```r
+avocado_short&lt;-avocado%&gt;%
+  select(date, average_price, total_volume, region)%&gt;%
+  mutate(total_price=average_price*total_volume)
+
+avocado_short%&gt;%head()
+```
+
+```
+## # A tibble: 6 x 5
+##   date       average_price total_volume region total_price
+##   &lt;date&gt;             &lt;dbl&gt;        &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;
+## 1 2015-12-27          1.33       64237. Albany      85435.
+## 2 2015-12-20          1.35       54877. Albany      74084.
+## 3 2015-12-13          0.93      118220. Albany     109945.
+## 4 2015-12-06          1.08       78992. Albany      85312.
+## 5 2015-11-29          1.28       51040. Albany      65331.
+## 6 2015-11-22          1.26       55980. Albany      70535.
+```
+---
+# `mutate()` and `transmute` to add variables
+
+If you only want to keep the new variables, use `transmute()`:
+
+
+
+
+```r
+avocado_too_short&lt;-avocado%&gt;%
+  select(date, average_price, total_volume, region)%&gt;%
+  transmute(total_price=average_price*total_volume)
+```
+
+---
+#Grouped summaries with `summarise()`
+
+
+```r
+avocado%&gt;%
+  summarize(average_volume=mean(total_volume)) #note that both spellings work!
+```
+
+```
+## # A tibble: 1 x 1
+##   average_volume
+##            &lt;dbl&gt;
+## 1        850644.
+```
+
+pair it with `group_by()` to do your manipulation with a GROUP of observations.
+
+
+```r
+avocado%&gt;%
+  group_by(region)%&gt;%
+  summarize(average_volume=mean(total_volume)) 
+```
+
+```
+## # A tibble: 54 x 2
+##    region              average_volume
+##    &lt;chr&gt;                        &lt;dbl&gt;
+##  1 Albany                      47538.
+##  2 Atlanta                    262145.
+##  3 BaltimoreWashington        398562.
+##  4 Boise                       42643.
+##  5 Boston                     287793.
+##  6 BuffaloRochester            67936.
+##  7 California                3044324.
+##  8 Charlotte                  105194.
+##  9 Chicago                    395569.
+## 10 CincinnatiDayton           131722.
+## # … with 44 more rows
+```
+Can you find the minimum average price per region (HINT: use `min()`)?
+
+Can you find the maximum average price per region per year (HINT: use `max()`)?
+
+---
+#  `count()` and `add_count()`
+
+lets you quickly count the unique values of one or more variables
+
+
+```r
+avocado%&gt;%
+  select(year, region, average_price)%&gt;%
+  count(region)%&gt;%
+  head()
+```
+
+```
+## # A tibble: 6 x 2
+##   region                  n
+##   &lt;chr&gt;               &lt;int&gt;
+## 1 Albany                338
+## 2 Atlanta               338
+## 3 BaltimoreWashington   338
+## 4 Boise                 338
+## 5 Boston                338
+## 6 BuffaloRochester      338
+```
+---
+#  `count()` and `add_count()`
+
+
+```r
+avocado%&gt;%
+  select(year, region, average_price)%&gt;%
+  add_count(region, year)%&gt;%
+  head()
+```
+
+```
+## # A tibble: 6 x 4
+##    year region average_price     n
+##   &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt; &lt;int&gt;
+## 1  2015 Albany          1.33   104
+## 2  2015 Albany          1.35   104
+## 3  2015 Albany          0.93   104
+## 4  2015 Albany          1.08   104
+## 5  2015 Albany          1.28   104
+## 6  2015 Albany          1.26   104
+```
+Review Help and locate how you can sort values with `count()` and `add_count()`
+---
+
+#Take away points
+
+- loading `tidyverse`
+
+- tidy data rules
+
+- working with functions through piping `%&gt;%`
+
+- working with basic functions from `tidyverse`
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
