@@ -1,0 +1,69 @@
+---
+title: "R/RMarkdown refresher"
+author: "Maria Prokofieva"
+date: "11/05/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+mac_index<-read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-12-22/big-mac.csv")
+```
+
+The *data* is loaded in a **new** variable `mac_index`
+
+```{r}
+mac_index%>%head()
+
+country<-mac_index$name
+
+country%>%head()
+
+#saving my data as csv file
+write_csv(mac_index,"mac_index.csv")
+
+new_data<-read_csv("mac_index.csv")
+```
+
+# Avocado dataset wrangling
+
+```{r}
+avocado<-read_csv("avocado.csv")
+
+```
+
+The dataset is tidy data, but variables are not properly named...
+
+Shortcut for r chunk creation is `Command+Option+i` or `Ctrl +Alt +i`
+
+```{r}
+#install.packages("janitor") 
+#if you don't comment the line above, it willl be executed every time you Knit your document
+
+library(janitor)
+
+avocado<-avocado%>%
+  clean_names()
+
+avocado%>%glimpse()
+```
+
+Let's filter the data
+
+
+```{r}
+#average_price above 2.5
+avocado%>%filter(average_price>2.5)
+
+#average_price equal or above 2.5 AND the region is "Albany"
+avocado%>%filter(average_price>=2.5 & region=="Albany")
+#avocados in Albany are NOT that expensive, no observations with that average_price there.
+
+
+#rename
+```
