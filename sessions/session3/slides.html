@@ -294,6 +294,9 @@ What if my data is not tidy?
 
 ![ ](img/tidydata.png)
 ---
+![ ](img/tidydata_1.jpeg)
+---
+
 #Basic functions to review
 
 - `glimpse()`
@@ -426,6 +429,7 @@ Use Help to explore options other options in the `clean_names()` function
 ---
 # `filter()`
 
+![ ](img/filter.png)
 select rows using a condition (=subsetting)
 
 
@@ -476,6 +480,9 @@ avocado%&gt;%filter(average_price&gt;2|region=="Seattle")%&gt;%head()
 
 `arrange()` orders the rows of a data by the values of selected columns
 
+![ ](img/arrange.png)
+---
+
 
 ```r
 avocado %&gt;% 
@@ -502,6 +509,7 @@ Study Help and see how you can arrange values in the descending order
 ---
 # Select columns with `select()`
 
+![ ](img/select.png)
 
 
 ```r
@@ -546,6 +554,8 @@ Study Help and see how you can rename `region` variable into `country`
 
 `mutate()` always adds new columns at the end of your dataset
 
+![ ](img/mutate.png)
+---
 
 
 ```r
@@ -583,6 +593,11 @@ avocado_too_short&lt;-avocado%&gt;%
 
 ---
 #Grouped summaries with `summarise()`
+![ ](img/group_by.png)
+---
+
+![ ](img/summarize.png)
+---
 
 
 ```r
@@ -598,6 +613,7 @@ avocado%&gt;%
 ```
 
 pair it with `group_by()` to do your manipulation with a GROUP of observations.
+---
 
 
 ```r
