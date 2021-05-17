@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BCO7000: Session 5</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr Maria Prokofieva" />
+    <meta name="date" content="2021-01-01" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/shinobi.css" rel="stylesheet" />
+    <link href="libs/remark-css/ninjutsu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# BCO7000: Session 5
+## ⚔<br/>Working with Different Data Formats
+### Dr Maria Prokofieva
+### VU Business School
+### 2021
+
+---
+
+
+
+# Plan for today
+
+- Types of variables
+
+- Working with factors
+
+- Working with text (=strings)
+
+- Working with dates
+---
+#Types of data
+
+- Discrete variables
+
+- Continous variables
+
+- Categorical/Ordinal variables = factors
+
+- Textual information: what is specific about it?
+
+- Dates: what is specific about working with dates?
+
+---
+#Dataset
+
+We will be working with a pizza dataset from Tidy Tuesday project
+[Link](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-10-01)
+
+
+
+```r
+pizza&lt;-read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_jared.csv")
+
+pizza %&gt;% head
+```
+
+```
+## # A tibble: 6 x 9
+##   polla_qid answer  votes pollq_id question    place    time total_votes percent
+##       &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;   &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;
+## 1         2 Excell…     0        2 How was Pi… Pizza… 1.34e9          13  0     
+## 2         2 Good        6        2 How was Pi… Pizza… 1.34e9          13  0.462 
+## 3         2 Average     4        2 How was Pi… Pizza… 1.34e9          13  0.308 
+## 4         2 Poor        1        2 How was Pi… Pizza… 1.34e9          13  0.0769
+## 5         2 Never …     2        2 How was Pi… Pizza… 1.34e9          13  0.154 
+## 6         3 Excell…     1        3 How was Ma… Maffe… 1.35e9           7  0.143
+```
+
+---
+#Discrete vs continous variables
+
+A **discrete** variable: a variable whose value is obtained by counting. 
+
+Examples: 1, 2, 4
+
+A **continuous** variable: a variable whose value is obtained by measuring. 
+
+Examples: 1.4, 2.78, 4.54
+
+We can use `skimr` package to easily see the types of variables. 
+
+`summary()` is another base R function that can do this in a less visual way.
+
+**Task**: use Help to read about `skimr` package and `summary()` function uses.
+
+Use both functions to see variables in the `pizza` dataset
+---
+# Working with variables in R
+
+
+```r
+class(pizza$polla_qid)
+```
+
+```
+## [1] "numeric"
+```
+
+```r
+class(pizza$percent)
+```
+
+```
+## [1] "numeric"
+```
+---
+# Categorical/Ordinal variables 
+
+a variable that can take on one of a limited, and usually fixed, number of possible values
+
+Called `Factors` in R
+
+
+```r
+class(pizza$answer)
+```
+
+```
+## [1] "character"
+```
+
+not factor yet!
+
+To make it factor let's try 
+
+
+```r
+pizza$answer&lt;-as_factor(pizza$answer)
+
+class(pizza$answer)
+```
+
+```
+## [1] "factor"
+```
+---
+
+# Factors
+
+R uses `factors` to handle categorical variables
+
+Factors are also helpful for reordering character vectors to improve display. 
+
+![ ](img/logos_tidyverse_forcats.png)
+---
+#Task
+
+Explore the dataset and think about where else we need to use factors. 
+Make the correction necessary 
+
+Use `glimpse()` to show the variable types
+
+---
+# Major functions to work with factors
+
+fct_reorder(): Reordering a factor by another variable.
+
+fct_infreq(): Reordering a factor by the frequency of values.
+
+fct_relevel(): Changing the order of a factor by hand.
+
+fct_lump(): Collapsing the least/most frequent values of a factor into “other”.
+
+---
+#Text
+
+- Characters vs strings
+
+Strings are not glamorous, high-profile components of R, but they do play a big role in many data cleaning and preparation tasks. 
+
+The `stringr` package provide a cohesive set of functions designed to make working with strings as easy as possible. 
+---
+# Working with strings
+
+Cheatsheet https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
+
+**Task**: review the dataset and see how main string functions can be applied
+
+
+---
+# Dates
+
+Date-time data can be frustrating to work with in R. 
+
+R commands for date-times are generally unintuitive and change depending on the type of date-time object being used. 
+
+Moreover, the methods we use with date-times must be robust to time zones, leap days, daylight savings times, and other time related quirks, and R lacks these capabilities in some situations. 
+
+Lubridate makes it easier to do the things R does with date-times and possible to do the things R does not.
+
+If you are new to lubridate, the best place to start is the date and times chapter in R for data science.
+
+---
+# Working with dates in R
+
+Cheatsheet https://rawgit.com/rstudio/cheatsheets/master/lubridate.pdf
+
+**Task**: review the dataset and see how main dates functions can be applied
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

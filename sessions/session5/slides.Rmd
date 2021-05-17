@@ -1,6 +1,6 @@
 ---
-title: "BCO7000: Session  "
-subtitle: "⚔<br/>Session 5"
+title: "BCO7000: Session 5 "
+subtitle: "⚔<br/>Working with Different Data Formats"
 author: "Dr Maria Prokofieva"
 institute: "VU Business School"
 date: "2021"
@@ -25,15 +25,153 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.height = 4,
                       fig.width = 8,
                       fig.align = "center")
+library(tidyverse)
+library (skimr)
 ```
-background-image: url("img/bg.jpg")
+# Plan for today
+
+- Types of variables
+
+- Working with factors
+
+- Working with text (=strings)
+
+- Working with dates
+---
+#Types of data
+
+- Discrete variables
+
+- Continous variables
+
+- Categorical/Ordinal variables = factors
+
+- Textual information: what is specific about it?
+
+- Dates: what is specific about working with dates?
 
 ---
-# Well - let's warm  up ...
+#Dataset
 
-In the center of the river, there lay 2 islands that were connected to each other and the river banks by 7 bridges.
+We will be working with a pizza dataset from Tidy Tuesday project
+[Link](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-10-01)
 
-Is there a route that would allow someone to cross all 7 bridges without crossing any of them more than once?
 
-![](img/k3.jpg)
+```{r}
+pizza<-read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_jared.csv")
+
+pizza %>% head
+```
+
 ---
+#Discrete vs continous variables
+
+A **discrete** variable: a variable whose value is obtained by counting. 
+
+Examples: 1, 2, 4
+
+A **continuous** variable: a variable whose value is obtained by measuring. 
+
+Examples: 1.4, 2.78, 4.54
+
+We can use `skimr` package to easily see the types of variables. 
+
+`summary()` is another base R function that can do this in a less visual way.
+
+**Task**: use Help to read about `skimr` package and `summary()` function uses.
+
+Use both functions to see variables in the `pizza` dataset
+---
+# Working with variables in R
+
+```{r}
+
+class(pizza$polla_qid)
+class(pizza$percent)
+```
+---
+# Categorical/Ordinal variables 
+
+a variable that can take on one of a limited, and usually fixed, number of possible values
+
+Called `Factors` in R
+
+```{r}
+class(pizza$answer)
+```
+
+not factor yet!
+
+To make it factor let's try 
+
+```{r}
+pizza$answer<-as_factor(pizza$answer)
+
+class(pizza$answer)
+```
+---
+
+# Factors
+
+R uses `factors` to handle categorical variables
+
+Factors are also helpful for reordering character vectors to improve display. 
+
+![ ](img/logos_tidyverse_forcats.png)
+---
+#Task
+
+Explore the dataset and think about where else we need to use factors. 
+Make the correction necessary 
+
+Use `glimpse()` to show the variable types
+
+---
+# Major functions to work with factors
+
+fct_reorder(): Reordering a factor by another variable.
+
+fct_infreq(): Reordering a factor by the frequency of values.
+
+fct_relevel(): Changing the order of a factor by hand.
+
+fct_lump(): Collapsing the least/most frequent values of a factor into “other”.
+
+---
+#Text
+
+- Characters vs strings
+
+Strings are not glamorous, high-profile components of R, but they do play a big role in many data cleaning and preparation tasks. 
+
+The `stringr` package provide a cohesive set of functions designed to make working with strings as easy as possible. 
+---
+# Working with strings
+
+Cheatsheet https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
+
+**Task**: review the dataset and see how main string functions can be applied
+
+
+---
+# Dates
+
+Date-time data can be frustrating to work with in R. 
+
+R commands for date-times are generally unintuitive and change depending on the type of date-time object being used. 
+
+Moreover, the methods we use with date-times must be robust to time zones, leap days, daylight savings times, and other time related quirks, and R lacks these capabilities in some situations. 
+
+Lubridate makes it easier to do the things R does with date-times and possible to do the things R does not.
+
+If you are new to lubridate, the best place to start is the date and times chapter in R for data science.
+
+---
+# Working with dates in R
+
+Cheatsheet https://rawgit.com/rstudio/cheatsheets/master/lubridate.pdf
+
+**Task**: review the dataset and see how main dates functions can be applied
+
+
+
