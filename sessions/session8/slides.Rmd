@@ -46,7 +46,7 @@ arable_land %>%
   filter(entity == "Afghanistan") %>%
   ggplot(aes(year, arable_land_needed)) +
   geom_line()
-fertilizer <- fertilizer %>%
+fertilizer <- fertilizer %>% 
   janitor::clean_names() %>%
   rename(yield = 4,
          fertilizer_use = 5)
