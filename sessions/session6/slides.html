@@ -14,7 +14,7 @@
 class: center, middle, inverse, title-slide
 
 # BCO7000: Session 6
-## ⚔<br/>Introduction to modelling
+## ⚔<br/>Data visualiation II
 ### Dr Maria Prokofieva
 ### VU Business School
 ### 2021
@@ -25,198 +25,157 @@ class: center, middle, inverse, title-slide
 
 #Plan for today
 
-- Revising math 
+- data visualization with grammar of graphics
 
-- Basic concepts of modeling
+- `geom_` layers
 
-- Basic models
+- coordinates
 
-- Revision of linear regression
+- themes
 
-- Modeling in R
+- legend
+
+- animations and `gganimate`
+
+**Dataset**: hotel bookings https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-11/readme.md 
+---
+# Refresh:
+
+![ ](img/workflow2.png)
+
 
 ---
-# Revising math 
+
+# Working with the dataset:
+
+**Task**: how can we load the dataset?
+
+What steps should we do to explore the dataset?
+
+What variables/observations does it have?
+
+Is it tidy?
+
+What questions can we ask with this data?
+
+What transformation should be done to address questions?
 
 ---
-# What is a model
+# Let's revise the grammar of graphics
 
-How do you understand the term `model`?
+![ ](img/grammar.png) 
+---
+#Let's put it all together for our dataset
 
-Think about examples of a model from  your daily life
+[hotel bookings](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-02-11/readme.md)
+
+Use `tidyverse` functions to explore the dataset
+
+- skimr package
+- distinct()
+- count()
+- arrange()
+- group_by and summarise()
 
 ---
 # Basic concepts of modeling
 
 ![ ](img/modelflow.png) 
 
+
 ---
 # Basic concepts of modeling
 
 ![ ](img/model.png) 
 
----
-# Basic concepts of modeling
-
-Workflow that involves all of the steps where the data are analyzed in a significant way
-
-- includes the model but 
-
-might also include other estimation steps: 
-
-- data preparation steps (e.g. imputation, encoding, transformations, etc) 
-
-- selection of which terms go into the model and so on. 
 
 ---
-# Basic models
+# Animation with `gganimate`
 
-- regression models
+- If a picture is worth a thousand words, than animation is....
 
-- classification models
+![ ](img/bomb.jpeg) 
 
+## Why animation
+
+- engage readers and viewers in ways other visualization types may not be able to
+
+- help people see transitions from one state to the next 
+
+- enable them to more easily track changes as parts of your visualizations move from one point to another.
+---
+# When to use animation:
+
+- Illustrating progression
+
+- Seeing and understanding changes
+
+- Exploration and analysis
+
+- Communication for impact
+
+https://www.tableau.com/about/blog/2020/3/benefits-animating-your-data-visualisations
 
 ---
-# Correlation
 
-*Correlation* is a statistic that measures the degree to which two variables move in relation to each other.
+# `gganimate()`
 
-Correlation measures association, but does not tell you if x causes y or vice versa, or if the association is caused by some third (perhaps unseen) factor.
+![ ](img/gganimate.png) 
+- extends the grammar of graphics of `ggplot2` to include animation
 
-Correlation is Positive when the values increase together, and
+It adds new classes to work to work with animation:
 
-Correlation is Negative when one value decreases as the other increases
+- `transition_*()` defines how the data should be spread out and how it relates to itself across time.
 
----
-# Correlation
+- `view_*()` defines how the positional scales should change along the animation.
 
-Correlation can have a value:
+- `shadow_*()` defines how data from other points in time should be presented in the given point in time.
 
-1 is a perfect positive correlation
+- `enter_*()/exit_*()` defines how new data should appear and how old data should disappear during the course of the animation.
 
-0 is no correlation (the values don't seem linked at all)
-
--1 is a perfect negative correlation
-
-
-![ ](img/cor.png) 
-
----
-# Correlation
-
-“corrr” package
-
-Key R function: `correlate()`, which is a wrapper around the cor() R base function but with the following advantages:
-
-Handles missing values by default with the optionuse = "pairwise.complete.obs"
-
-Diagonal values is set to NA, so that it can be easily removed
-Returns a data frame, which can be easily manipulated using the tidyverse package.
-
----
-#`corrr` package
-
-Additional arguments for the function correlate(), include:
-
-`method`: a character string indicating which correlation coefficient (or covariance) is to be computed. One of “pearson” (default),
-
-“kendall”, or “spearman”: can be abbreviated.
-
-diagonal: Value (typically numeric or NA) to set the diagonal to.
+- `ease_aes()` defines how different aesthetics should be eased during transitions.
 ---
 
-#`corrr` package
-
-Internal changes (cor_df out):
-
-shave() the upper or lower triangle (set to NA).
-
-rearrange() the columns and rows based on correlation strengths.
+#Example
 
 
-Reshape structure (tbl or cor_df out):
+```r
+#install.packages('gganimate')
+library(gganimate)
 
-focus() on select columns and rows.
-
-stretch() into a long format.
-
-
-Output/visualisations (console/plot out):
-
-fashion() the correlations for pretty printing.
-
-rplot() the correlations with shapes in place of the values.
-
-network_plot() the correlations in a network.
-
+mtcars %&gt;% ggplot(aes(factor(cyl), mpg)) + 
+  geom_boxplot() + 
+  
+  # Here comes the gganimate code
+  transition_states(
+    gear,
+    transition_length = 2,
+    state_length = 1
+  ) +
+  enter_fade() + 
+  exit_shrink() +
+  ease_aes('sine-in-out')
+```
 ---
-# Correlation Is Not Causation
+# Gapminder example
 
-One thing might cause the other
 
-The other might cause the first to happen
+```r
+#install.packages("gapminder")
 
-They may be linked by a different thing
+library(gapminder)
 
-Or it could be random chance!
-
-https://www.khanacademy.org/math/probability/scatterplots-a1/creating-interpreting-scatterplots/v/correlation-and-causality
-
----
-# Linear regression
-
-is one of the simplest and most common supervised machine learning algorithms that data scientists use for predictive modeling.
-
-Aim: to model a continuous variable Y as a mathematical function of one or more X variable(s), so that we can use this regression model to predict the Y when only the X is known:
-
-Y = β1 + β2X1 + ϵ
-
-Height = b1 +b2 age + b3 nationality + b4 parents + b5 height of neighbors
-
-where, β1 is the intercept and β2 is the slope. 
-
-Collectively, they are called regression coefficients. ϵ is the error term, the part of Y the regression model is unable to explain.
-
----
-# Linear regression
-
-Linear regression assumes that there exists a linear relationship between the response variable and the explanatory variables. 
-
-This means that you can fit a line between the two (or more variables). 
-
-![ ](img/lm.png) 
----
-# Example
-
-Height=a+Age∗b
-
-![ ](img/lm2.png) 
-
-“a” and “b” are called the intercept and the slope respectively. 
-
-“a” or the intercept, is the value from where you start measuring. 
----
-# Example
-
-Height=a+Age∗b
-
-![ ](img/lm2.png)
-
-Newborn babies with zero months are not zero centimeters necessarily; this is the function of the intercept. The slope measures the change of height with respect to the age in months. In general, for every month older the child is, his or her height will increase with “b”.
-
----
-# Linear regression in R
-
- lm function: 
- 
-lm([target variable] ~ [predictor variables], data = [data source])
-
-The data can be downloaded from VU Collaborate. 
-
-Download the data to an object called ageandheight and then create
-summary(lmHeight) you can see detailed information on the model’s performance and coefficients.
-
----
+ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, colour = country)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  scale_colour_manual(values = country_colors) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(~continent) +
+  # Here comes the gganimate specific bits
+  labs(title = 'Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy') +
+  transition_time(year) +
+  ease_aes('linear')
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
