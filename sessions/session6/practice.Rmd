@@ -1,0 +1,135 @@
+---
+title: "session 6 practice"
+author: "Maria Prokofieva"
+date: "21/05/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Hotel bookings dataset
+
+Today we are working with `hotel bookings` dataset from [TidyTuesday project](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-02-11)
+
+We are going to use core functions from [`tidyverse`](https://www.tidyverse.org/packages/#core-tidyverse)
+
+Let's load libraries 
+
+```{r}
+library(tidyverse)
+library(skimr)
+```
+
+and loading the dataset `hotel bookings` using the description at the `github` page
+
+```{r}
+hotels <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-02-11/hotels.csv')
+
+head(hotels)
+```
+
+Let's explore the dataset
+```{r}
+
+hotels %>%skim()
+
+hotels%>%distinct(hotel)
+
+hotels%>%count(hotel)
+
+hotels%>%count(arrival_date_year)
+
+```
+
+Let's do some data transformation as discussed in the class:
+
+```{r}
+hotels%>%
+  mutate(arrival_date_year=as_factor(arrival_date_year))%>%
+  group_by(arrival_date_year)%>%
+  count(is_canceled, sort=TRUE)%>%
+  ungroup()
+
+
+hotels%>%
+  group_by(hotel)%>%
+  mutate(average_lead_time=mean(lead_time))%>%
+  ungroup()
+  
+hotels%>%head()
+```
+
+How is this different from? Why? What changed?
+
+```{r eval=FALSE}
+hotels%>%
+ # group_by(hotel)%>%
+  mutate(average_lead_time=mean(lead_time))%>%
+ # ungroup()
+  
+hotels%>%head()
+```
+
+What does it show us?
+
+How is this different from? What changed?
+
+```{r}
+hotels%>%
+  group_by(hotel)%>%
+  mutate(m_lead_time=max(lead_time))%>%
+  ungroup()
+  
+hotels%>%head()
+```
+
+How is this different if we use `summarise`?
+
+Average number of days in `lead_time` per type of hotel
+
+```{r}
+hotels%>%
+  group_by(hotel)%>%
+  summarise(average_lead_time=mean(lead_time))%>%
+  ungroup()
+```
+
+Data viz of cancellations per type of hotel
+
+```{r}
+hotels%>%ggplot(
+  aes(is_canceled)
+)+
+  geom_bar()+
+  facet_wrap(vars(hotel))
+
+```
+
+Calculate the maximum `lead_time`
+
+```{r}
+
+hotels%>%
+  group_by(hotel)%>%
+  mutate(max_lead_time=max(lead_time))%>%
+  filter(hotel=="City Hotel")%>%
+  select (hotel, max_lead_time)%>%
+  ungroup()
+
+```
+
+How can we plot number of adults (`adults`) against number of days in weekends bookeed?
+
+```{r}
+hotels %>%
+  ggplot(
+    aes(x=adults, y=stays_in_weekend_nights))+
+  geom_point()
+```
+
+What does this tell us about data?
+
+
+
