@@ -1,147 +1,350 @@
 ---
-title: "Modeling - II"
-author: "Maria Prokofieva"
-date: "18/05/2021"
-output: html_document
+title: "BCO7000: Session 7 "
+subtitle: "⚔<br/>Working with Different Data Formats"
+author: "Dr Maria Prokofieva"
+institute: "VU Business School"
+date: "2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["shinobi", "ninjutsu"]
+    seal: true
+    self_contained: false
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false      
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE,   
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.height = 4,
+                      fig.width = 8,
+                      fig.align = "center")
 
-Today we extend our knowledge of `data modeling` and going to use this
-[coffee ratings dataset]() from the well-known [Tidy Tuesday project]()
+```
+# Plan for today
+
+- Types of variables
+
+- Working with factors
+
+- Working with text (=strings)
+
+- Working with dates
+---
+#Types of data
+
+- Discrete variables
+
+- Continuous variables
+
+- Categorical/Ordinal variables = factors
+
+- Textual information: what is specific about it?
+
+- Dates: what is specific about working with dates?
+
+Let's look at the [hotel bookings data](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-02-11) and see what variable types we have and if they are recorded properly
+
 ```{r}
-library(tidytuesdayR)
+#install.packages("lubridate")
 library(tidyverse)
-theme_set(theme_light())
-coffee <- tt_load("2020-07-07")
-coffee_ratings <- coffee$coffee_ratings %>%
-  mutate(coffee_id = row_number()) %>%
-  filter(total_cup_points > 0)
+library (skimr)
+library(lubridate)
+
+hotels <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-02-11/hotels.csv')
+
 ```
 
+```{r eval=FALSE}
+summary(hotels)
+
+skim(hotels)
+```
+---
+#Discrete variables and Continous variables
+
+![ ](img/continuous_discrete.png)
+---
+#Categorical/Ordinal variables = factors in R
+
+![ ](img/nominal_ordinal_binary.png)
+---
+#Let's convert between different types of variables
+
+`as_factor()`: converts to a factor
+
+`as_string()`: converts symbols to strings
+
+`as_integer()`: converts to an integer
+
+`as_logical()`: converts to logical TRUE or FALSE
+
+![ ](img/parse_number.png)
+Let's do some conversion in the dataset.
+
+---
+#case_when
+
+![ ](img/dplyr_case_when.png)
+
+---
+Let's have a look at this example and try to understand what is it doing and how we convert and transform the data here:
+
+
 ```{r}
-View(coffee_ratings)
-coffee_ratings %>%
-  count(species, sort = TRUE)
-coffee_lumped <- coffee_ratings %>%
-  filter(!is.na(variety)) %>%
-  mutate(variety = fct_lump(variety, 12), sort = TRUE)
-coffee_lumped %>%
-  mutate(variety = fct_reorder(variety, total_cup_points)) %>%
-  ggplot(aes(total_cup_points, variety)) +
-  geom_boxplot()
-coffee_lumped %>%
-  ggplot(aes(total_cup_points, fill = variety)) +
-  geom_histogram(binwidth = 2) +
-  facet_wrap(~ variety, scale = "free_y") +
-  theme(legend.position = "none")
+hotel_stays <- hotels %>%
+  filter(is_canceled == 0) %>%
+  mutate(
+    children = case_when(
+      children + babies > 0 ~ "children",
+      TRUE ~ "none"
+    ),
+    required_car_parking_spaces = case_when(
+      required_car_parking_spaces > 0 ~ "parking",
+      TRUE ~ "none"
+    )
+  ) %>%
+  select(-is_canceled, -reservation_status, -babies)
+```
+---
+
+
+```{r}
+hotel_stays %>%
+  mutate(arrival_date_month = factor(arrival_date_month,
+    levels = month.name
+  )) %>%
+  count(hotel, arrival_date_month, children) %>%
+  group_by(hotel, children) %>%
+  mutate(proportion = n / sum(n)) %>%
+  ggplot(aes(arrival_date_month, proportion, fill = children)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  facet_wrap(~hotel, nrow = 2) +
+  labs(
+    x = NULL,
+    y = "Proportion of hotel stays",
+    fill = NULL
+  )
+
+```
+---
+#NEW Dataset
+
+We will be working with a pizza dataset from Tidy Tuesday project
+[Link](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-10-01)
+
+```{r}
+pizza<-read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_jared.csv")
+
+pizza %>% head
+```
+---
+#Discrete vs continous variables
+
+A **discrete** variable: a variable whose value is obtained by counting. 
+
+Examples: 1, 2, 4
+
+A **continuous** variable: a variable whose value is obtained by measuring. 
+
+Examples: 1.4, 2.78, 4.54
+
+We can use `skimr` package to easily see the types of variables. 
+
+`summary()` is another base R function that can do this in a less visual way.
+
+**Task**: use Help to read about `skimr` package and `summary()` function uses.
+
+Use both functions to see variables in the `pizza` dataset
+
+---
+# Working with variables in R
+
+```{r}
+
+class(pizza$polla_qid)
+class(pizza$percent)
+```
+---
+# Categorical/Ordinal variables 
+
+a variable that can take on one of a limited, and usually fixed, number of possible values
+
+Called `Factors` in R
+
+```{r}
+class(pizza$answer)
 ```
 
+not factor yet!
+
+To make it factor let's try 
+
 ```{r}
-coffee_ratings %>%
-  summarize(across(everything(), ~ mean(!is.na(.)))) %>%
-  gather() %>%
-  View()
-coffee_ratings %>%
-  count(producer, sort = TRUE)
-coffee_ratings %>%
-  count(company, sort = TRUE)
-coffee_ratings %>%
-  count(color, sort = TRUE)
-coffee_ratings %>%
-  count(country = fct_lump(country_of_origin, 12), sort = TRUE) %>%
-  filter(!is.na(country)) %>%
-  mutate(country = fct_reorder(country, n)) %>%
-  ggplot(aes(n, country)) +
-  geom_col()
-coffee_ratings %>%
-  filter(!is.na(country_of_origin)) %>%
-  mutate(country = fct_lump(country_of_origin, 12),
-         country = fct_reorder(country, total_cup_points)) %>%
-  ggplot(aes(total_cup_points, country)) +
-  geom_boxplot()
+pizza$answer<-as_factor(pizza$answer)
+
+class(pizza$answer)
 ```
+---
 
-Interesting dimensions:
+# Factors
 
-* Country
-* Variety
-* Company??
+R uses `factors` to handle categorical variables
+
+Factors are also helpful for reordering character vectors to improve display. 
+
+![ ](img/logos_tidyverse_forcats.png)
+---
+#Task
+
+Explore the dataset and think about where else we need to use factors. 
+Make the correction necessary 
+
+Use `skim()` to show the variable types
+
+---
+
+# Major functions to work with factors
+
+fct_reorder(): Reordering a factor by another variable.
+
+fct_infreq(): Reordering a factor by the frequency of values.
+
+fct_relevel(): Changing the order of a factor by hand.
+
+fct_lump(): Collapsing the least/most frequent values of a factor into “other”.
+
+
+**Task**: review the dataset and identify where these functions can be applied.
+---
+# Dates
+
+Date-time data can be frustrating to work with in R. 
+
+R commands for date-times are generally unintuitive and change depending on the type of date-time object being used. 
+
+Moreover, the methods we use with date-times must be robust to time zones, leap days, daylight savings times, and other time related quirks, and R lacks these capabilities in some situations. 
+
+Lubridate makes it easier to do the things R does with date-times and possible to do the things R does not.
+
+If you are new to lubridate, the best place to start is the date and times chapter in R for data science.
+
+---
+# Working with dates in R
+
+Cheatsheet https://rawgit.com/rstudio/cheatsheets/master/lubridate.pdf
+
+**Task**: review the dataset and see how main dates functions can be applied
+
+![ ](img/lubridate.png)
+---
+# Major functions to work with dates:
 
 ```{r}
-library(ggridges)
-coffee_metrics <- coffee_ratings %>%
-  select(coffee_id, total_cup_points, variety, company,
-         country_of_origin,
-         altitude_mean_meters,
-         aroma:moisture) %>%
-  pivot_longer(aroma:cupper_points, names_to = "metric", values_to = "value")
-coffee_metrics %>%
-  mutate(metric = fct_reorder(metric, value)) %>%
-  ggplot(aes(value, metric)) +
-  geom_density_ridges()
-coffee_metrics %>%
-  group_by(metric) %>%
-  summarize(average = mean(value),
-            sd = sd(value)) %>%
-  arrange(desc(average))
+ymd("2017-01-31")
+mdy("January 31st, 2017")
+dmy("31-Jan-2017")
+
+ymd_hms("2017-01-31 20:11:59")
+mdy_hm("01/31/2017 08:01")
+
 ```
+---
+#Let's put it in practice
+
+Time format: POSIX
+
+`Unix` time (also known as Epoch time, POSIX time, seconds since the Epoch, or UNIX Epoch time) is a system for describing a point in time.
 
 ```{r}
-library(widyr)
-library(ggraph)
-library(igraph)
-library(tidytext)
-correlations <- coffee_metrics %>%
-  pairwise_cor(metric, coffee_id, value, sort = TRUE)
-correlations %>%
-  head(50) %>%
-  graph_from_data_frame() %>%
-  ggraph() +
-  geom_edge_link(aes(edge_alpha = correlation)) +
-  geom_node_point() +
-  geom_node_text(aes(label = name), repel = TRUE)
-coffee_metrics %>%
-  filter(!metric %in% c("sweetness", "clean_cup", "uniformity")) %>%
-  group_by(metric) %>%
-  mutate(centered = value - mean(value)) %>%
-  ungroup() %>%
-  widely_svd(metric, coffee_id, value) %>%
-  filter(between(dimension, 2, 5)) %>%
-  mutate(metric = reorder_within(metric, value, dimension)) %>%
-  ggplot(aes(value, metric)) +
+pizza$time %>%
+  head()
+
+#to convert to readable time
+time<-pizza$time %>%
+  as.POSIXct(origin = "1970-01-01") %>%
+  head()
+
+#to isolate date
+
+time%>%
+  as.Date()%>%
+  head()
+```
+---
+#Let's review `answer` variable
+
+```{r}
+#let's get the list of distinct answers
+pizza%>%
+  distinct(answer)
+
+answer_orders <- c("Never Again", "Poor", "Average", "Good", "Excellent")
+
+#let's clean the names in our dataset
+pizza <- pizza %>%
+  mutate(time = as.POSIXct(time, origin = "1970-01-01"),
+         date = as.Date(time),
+         answer = fct_relevel(answer, answer_orders)) 
+
+#let's see where the best place is
+
+by_place_answer<-pizza%>%
+  group_by(place, answer) %>%
+  summarize(votes = sum(votes))%>%
+  mutate(total = sum(votes),
+         percent = votes / total,
+         answer_integer = as.integer(answer),
+         average = sum(answer_integer * percent)) %>%
+  ungroup()
+
+by_place <- by_place_answer %>%
+  distinct(place, total, average)
+```
+---
+#Let's put it on the dataviz
+
+```{r}
+by_place_answer %>%
+  filter(as.integer(fct_reorder(place, total, .desc = TRUE)) <= 16,
+         answer != "Fair") %>%
+  mutate(place = glue::glue("{ place } ({ total })"),
+         place = fct_reorder(place, average)) %>%
+  ggplot(aes(answer, percent)) +
   geom_col() +
-  scale_y_reordered() +
-  facet_wrap(~ dimension, scales = "free_y")
+  facet_wrap(~ place) +
+  scale_y_continuous(labels = scales::percent) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "",
+       y = "% of respondents",
+       title = "What is the most popular pizza place in Open Stats meetup?",
+       subtitle = "Only the 16 pizza places with the most respondents. # respondents shown in parentheses.")
 ```
 
-```{r}
-coffee_ratings %>%
-  filter(altitude_mean_meters < 10000,
-         altitude != 1) %>%
-  mutate(altitude_mean_meters = pmin(altitude_mean_meters, 3000)) %>%
-  ggplot(aes(altitude_mean_meters, total_cup_points)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-coffee_metrics %>%
-  filter(altitude_mean_meters < 10000) %>%
-  mutate(altitude_mean_meters = pmin(altitude_mean_meters, 3000)) %>%
-  mutate(km = altitude_mean_meters / 1000) %>%
-  group_by(metric) %>%
-  summarize(correlation = cor(altitude_mean_meters, value),
-            model = list(lm(value ~ km))) %>%
-  mutate(tidied = map(model, broom::tidy, conf.int = TRUE)) %>%
-  unnest(tidied) %>%
-  filter(term == "km") %>%
-  ungroup() %>%
-  mutate(metric = fct_reorder(metric, estimate)) %>%
-  ggplot(aes(estimate, metric, color = p.value < .05)) +
-  geom_point() +
-  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = .1) +
-  labs(y = "Evaluation of coffee",
-       x = "Each kilometer of altitude contributes this much to score (95% confidence interval)")
-```
+---
+#Text
+
+- Characters vs strings
+
+Strings are not glamorous, high-profile components of R, but they do play a big role in many data cleaning and preparation tasks. 
+
+The `stringr` package provide a cohesive set of functions designed to make working with strings as easy as possible. 
+---
+# Working with strings
+
+Cheatsheet https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
+
+**Task**: review the dataset and see how main string functions can be applied
+
+
+
+
 
 
