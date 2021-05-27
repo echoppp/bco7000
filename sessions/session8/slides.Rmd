@@ -1,166 +1,269 @@
 ---
-title: 'Session 8: Linear regression'
-author: "Maria Prokofieva"
-date: "18/05/2021"
-output: html_document
+title: "BCO7000: Session 8 "
+subtitle: "⚔<br/>Working with Different Data Formats 2"
+author: "Dr Maria Prokofieva"
+institute: "VU Business School"
+date: "2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["shinobi", "ninjutsu"]
+    seal: true
+    self_contained: false
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false      
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE,   
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.height = 4,
+                      fig.width = 8,
+                      fig.align = "center")
 
-#install.packages("tidytuesdayR")
+#install.packages("glue")
 library(tidyverse)
-library(tidytuesdayR)
+library(skimr)
+library(lubridate)
 library(scales)
-library(janitor)
+library(glue)
 theme_set(theme_light())
 ```
 
+# Pizza Dataset
+
+We will be working with a pizza dataset from Tidy Tuesday project
+[Link](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-10-01)
+
+![ ](img/pizza.jpeg)
 ---
-# Linear regression
-
-
-# Load the weekly Data
-
-Dowload the weekly data and make available in the `tt` object.
-
-
+# Pizza Dataset
 
 ```{r}
+pizza<-read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_jared.csv")
 
-key_crop_yields <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-01/key_crop_yields.csv')
-fertilizer <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-01/cereal_crop_yield_vs_fertilizer_application.csv')
-tractors <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-01/cereal_yields_vs_tractor_inputs_in_agriculture.csv')
-land_use <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-01/land_use_vs_yield_change_in_cereal_production.csv')
-arable_land <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-01/arable_land_pin.csv')
-
-key_crop_yields %>%
-  View()
-yields <- key_crop_yields %>%
-  clean_names() %>%
-  rename_all(str_remove, "_tonnes.*")
-arable_land <- arable_land %>%
-  clean_names() %>%
-  rename(arable_land_needed = 4)
-arable_land %>%
-  filter(entity == "Afghanistan") %>%
-  ggplot(aes(year, arable_land_needed)) +
-  geom_line()
-fertilizer <- fertilizer %>% 
-  janitor::clean_names() %>%
-  rename(yield = 4,
-         fertilizer_use = 5)
+pizza %>% head
 ```
 
-```{r}
-yields_tidy <- yields %>%
-  pivot_longer(wheat:bananas, names_to = "crop", values_to = "yield") %>%
-  filter(!is.na(yield)) %>%
-  mutate(crop = str_replace_all(crop, "_", " "),
-         crop = str_to_title(crop))
-#yields_tidy %>%
- # write_rds("crop-yields-shiny/yields_tidy.rds")
-```
+Task: explore the datatypes in the dataset using `skim()` function
+
+Are all variables recorded properly? Which ones we need to change?
+
+---
+# Factors
+
+Reminder: cheatsheet on factors https://github.com/rstudio/cheatsheets/blob/master/factors.pdf
 
 ```{r}
-yields_tidy %>%
-  filter(code == "USA") %>%
-  mutate(crop = fct_reorder(crop, -yield)) %>%
-  ggplot(aes(year, yield)) +
-  geom_line() +
-  facet_wrap(~ crop)
-yields_tidy %>%
-  filter(code == "USA") %>%
-  mutate(crop = fct_reorder(crop, -yield)) %>%
-  ggplot(aes(year, yield, color = crop)) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Yield (tonnes per hectare)",
-       title = "Crop yields in the US over time",
-       color = "Crop")
-yields_tidy %>%
-  filter(entity == "India") %>%
-  mutate(crop = fct_reorder(crop, -yield)) %>%
-  ggplot(aes(year, yield, color = crop)) +
-  geom_line() +
-  labs(x = "Year",
-       y = "Yield (tonnes per hectare)",
-       title = "Crop yields in the US over time",
-       color = "Crop")
+class(pizza$answer)
 ```
 
+not factor yet!
+
+To make it factor let's try 
+
 ```{r}
-yields_tidy %>%
-  filter(crop == "Wheat") %>%
-  add_count(entity) %>%
-  filter(n == max(n)) %>%
-  filter(entity %in% sample(unique(entity), 25)) %>%
-  ggplot(aes(year, yield)) +
-  geom_line() +
-  facet_wrap(~ entity)
-crop_yields_50_years <- yields_tidy %>%
-  arrange(entity, year) %>%
-  filter(year >= 1968) %>%
-  group_by(entity, code, crop) %>%
-  summarize(year_start = min(year),
-            year_end = max(year),
-            yield_start = first(yield),
-            yield_end = last(yield)) %>%
-  ungroup() %>%
-  filter(year_start == 1968) %>%
-  mutate(yield_ratio = yield_end / yield_start)
-crop_yields_50_years %>%
-  filter(!is.na(code)) %>%
-  ggplot(aes(yield_start, yield_end)) +
-  geom_abline(color = "red") +
-  geom_point() +
-  facet_wrap(~ crop, scales = "free")
-crop_yields_50_years %>%
-  mutate(crop = fct_reorder(crop, yield_ratio)) %>%
-  ggplot(aes(yield_ratio, crop)) +
-  geom_boxplot() +
-  scale_x_log10()
-crop_yields_50_years %>%
-  group_by(crop) %>%
-  summarize(median_yield_ratio = median(yield_ratio)) %>%
-  mutate(crop = fct_reorder(crop, median_yield_ratio)) %>%
-  ggplot(aes(median_yield_ratio, crop)) +
+class(pizza$answer)
+
+pizza$answer<-as_factor(pizza$answer)
+
+class(pizza$answer)
+```
+---
+# Factors
+
+Is this an "ordered" factor (reminder: categorical vs ordinal variables)?
+
+```{r}
+levels(pizza$answer)
+```
+
+How can we put this in order?
+
+```{r}
+answer_orders <- c("Never Again", "Poor", "Average", "Good", "Excellent")
+
+pizza<-pizza%>%
+  mutate(answer=fct_relevel(answer, answer_orders))
+
+levels(pizza$answer)
+```
+---
+#Time
+
+`lubridate` package
+
+Reminder: cheatsheet https://github.com/rstudio/cheatsheets/blob/master/lubridate.pdf
+
+Let's review the basic functions there:
+
+What `lubridate` function to parse each of the following dates?
+
+```{r}
+d1 <- "January 1, 2010"
+d2 <- "2015-Mar-07"
+d3 <- "06-Jun-2017"
+d4 <- c("August 19 (2015)", "July 1 (2015)")
+d5 <- "12/30/14" # Dec 30, 2014
+```
+---
+
+```{r}
+pizza<-pizza %>%
+  mutate(
+  time = as.POSIXct(time, origin = "1970-01-01"),
+  date = as.Date(time)
+         )
+```
+Task: pull out individual parts of the date and time variables with the functions 
+
+- `year()`, 
+- `month()`, 
+- `mday()` (day of the month), 
+- `yday()` (day of the year), 
+- `wday()` (day of the week), 
+- `hour()`, 
+- `minute()`, and 
+- `second()`.
+---
+Let's have a closer look at the data:
+
+```{r}
+by_place_answer <- pizza %>%
+  group_by(place, answer) %>%
+  summarize(votes = sum(votes)) 
+
+by_place_answer
+
+```
+---
+```{r}
+by_place_answer<-by_place_answer%>%
+  mutate(total = sum(votes),
+         percent = votes / total,
+         answer_integer = as.integer(answer),
+         average = sum(answer_integer * percent)) %>%
+  ungroup()
+```
+```{r} 
+by_place <- by_place_answer %>%
+  distinct(place, total, average)
+```
+---
+#Reordering factors for data viz
+
+```{r}
+by_place_answer %>%
+  filter(as.integer(fct_reorder(place, total, .desc = TRUE)) <= 16,
+         answer != "Fair") %>%
+  mutate(place = glue::glue("{ place } ({ total })"),
+         place = fct_reorder(place, average)) %>%
+  ggplot(aes(answer, percent)) +
   geom_col() +
-  labs(title = "How much has the average country improved at producing this crop?",
-       x = "(2018 yield) / (1968 yield)",
-       y = "")
-crop_yields_50_years %>%
-  filter(is.na(code)) %>%
-  filter(entity %in% c("Africa", "Asia", "Northern America", "South America", "Oceania")) %>%
-  ggplot(aes(yield_start, yield_end, color = entity)) +
-  geom_abline(color = "red") +
-  geom_point() +
-  expand_limits(y = 0, x = 0) +
-  facet_wrap(~ crop, scales = "free") +
-  labs(x = "Tonnes per hectare in 1968",
-       y = "Tonnes per hectare in 2018",
-       color = "Continent")
+  facet_wrap(~ place) +
+  scale_y_continuous(labels = scales::percent) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "",
+       y = "% of respondents",
+       title = "What is the most popular pizza place in Open Stats meetup?",
+       subtitle = "Only the 16 pizza places with the most respondents. # respondents shown in parentheses.")
 ```
 
+---
+#Text=Strings
+
+`stringr` package in `tidyverse
+https://stringr.tidyverse.org/
+
+Cheatsheet: https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
+
+Let's review basic function there:
+
 ```{r}
-library(ggrepel)
-library(countrycode)
-crop_yields_50_years %>%
-  filter(crop == "Wheat",
-         !is.na(code)) %>%
-  mutate(continent = countrycode(code, "iso3c", "continent")) %>%
-  filter(!is.na(continent)) %>%
-  ggplot(aes(yield_start, yield_ratio)) +
-  geom_point(aes(color = continent)) +
-  scale_x_log10() +
-  scale_y_log10(breaks = c(.25, .5, 1, 2, 4),
-                labels = c("1/4X", "1/2X", "Same", "2X", "4X")) +
-  geom_hline(yintercept = 1, linetype = "dotted") +
-  geom_text_repel(aes(label = entity), force = .1,
-                  size = 2.5) +
-  labs(x = "1968 yield (tonnes per hectare), log scale",
-       y = "(2018 yield) / (1968 yield), log scale",
-       color = "Continent",
-       title = "How has wheat efficiency changed across countries?")
-countrycode("USA", "iso3c", "continent")
+str_length(c("bco7000", "wonderful morning, everyone", NA))
+
+#To combine two or more strings, use str_c():
+str_c("x", "y")
+
+#or paste()
+```
+---
+
+`stringr` vignette https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html
+
+`glue` package https://cran.r-project.org/web/packages/glue/index.html
+---
+
+# Let's dig into our data more!
+
+```{r}
+pizza_barstool <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_barstool.csv")
+
+pizza_barstool %>%
+  top_n(50, review_stats_all_count) %>%
+  ggplot(aes(price_level, review_stats_all_average_score, group = price_level)) +
+  geom_boxplot()
+```
+---
+```{r}  
+pizza_barstool %>%
+  filter(review_stats_all_count >= 50) %>%
+  mutate(name = fct_reorder(name, review_stats_all_average_score)) %>%
+  ggplot(aes(review_stats_all_average_score, name, size = review_stats_all_count)) +
+  geom_point() +
+  labs(x = "Average rating",
+       y = "",
+       size = "# of reviews",
+       title = "Barstool Sports ratings of pizza places",
+       subtitle = "Only places with at least 50 reviews")
+```
+---
+
+```{r}
+pizza_barstool %>%
+  filter(review_stats_all_count >= 20) %>%
+  mutate(city = fct_lump(city, 3)) %>%
+  add_count(city) %>%
+  mutate(city = glue::glue("{ city } ({ n })")) %>%
+  ggplot(aes(city, review_stats_all_average_score)) +
+  geom_boxplot() +
+  labs(title = "Do pizza ratings differ across cities?",
+       subtitle = "Only pizza places with at least 20 reviews")
+```
+---
+
+```{r}
+pizza_cleaned <- pizza_barstool %>%
+  select(place = name,
+         price_level,
+         contains("review")) %>%
+  rename_all(~ str_remove(., "review_stats_")) %>%
+  select(-contains("provider"))
+pizza_cleaned %>%
+  filter(critic_count > 0) %>%
+  ggplot(aes(critic_average_score, dave_average_score)) +
+  geom_point() +
+  geom_abline(color = "red") +
+  geom_smooth(method = "lm") +
+  labs(title = "Does Barstool Sports' Dave agree with the critics?",
+       x = "Critic average score",
+       y = "Dave score")
+```
+---
+
+```{r}
+pizza_cleaned %>%
+  filter(community_count >= 20) %>%
+  ggplot(aes(community_average_score, dave_average_score)) +
+  geom_point(aes(size = community_count)) +
+  geom_abline(color = "red") +
+  geom_smooth(method = "lm") +
+  labs(size = "# of community reviews",
+       x = "Community score",
+       y = "Dave score")
 ```
