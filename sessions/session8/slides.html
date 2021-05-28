@@ -229,38 +229,6 @@ by_place_answer %&gt;%
 
 &lt;img src="slides_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
 
----
-#Text=Strings
-
-`stringr` package in `tidyverse
-https://stringr.tidyverse.org/
-
-Cheatsheet: https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
-
-Let's review basic function there:
-
-
-```r
-str_length(c("bco7000", "wonderful morning, everyone", NA))
-```
-
-```
-## [1]  7 27 NA
-```
-
-```r
-#To combine two or more strings, use str_c():
-str_c("x", "y")
-```
-
-```
-## [1] "xy"
-```
-
-```r
-#or paste()
-```
----
 
 `stringr` vignette https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html
 
@@ -279,7 +247,7 @@ pizza_barstool %&gt;%
   geom_boxplot()
 ```
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
 ---
 
 ```r
@@ -295,7 +263,7 @@ pizza_barstool %&gt;%
        subtitle = "Only places with at least 50 reviews")
 ```
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
 ---
 
 
@@ -311,7 +279,7 @@ pizza_barstool %&gt;%
        subtitle = "Only pizza places with at least 20 reviews")
 ```
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
 ---
 
 
@@ -333,7 +301,7 @@ pizza_cleaned %&gt;%
        y = "Dave score")
 ```
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
 ---
 
 
@@ -349,7 +317,7 @@ pizza_cleaned %&gt;%
        y = "Dave score")
 ```
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

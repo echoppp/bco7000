@@ -34,7 +34,6 @@ library(scales)
 library(glue)
 theme_set(theme_light())
 ```
-
 # Pizza Dataset
 
 We will be working with a pizza dataset from Tidy Tuesday project
@@ -174,25 +173,6 @@ by_place_answer %>%
        subtitle = "Only the 16 pizza places with the most respondents. # respondents shown in parentheses.")
 ```
 
----
-#Text=Strings
-
-`stringr` package in `tidyverse
-https://stringr.tidyverse.org/
-
-Cheatsheet: https://github.com/rstudio/cheatsheets/blob/master/strings.pdf
-
-Let's review basic function there:
-
-```{r}
-str_length(c("bco7000", "wonderful morning, everyone", NA))
-
-#To combine two or more strings, use str_c():
-str_c("x", "y")
-
-#or paste()
-```
----
 
 `stringr` vignette https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html
 
