@@ -1,206 +1,314 @@
 ---
-title: "Session 9"
-author: "Maria Prokofieva"
-date: "18/05/2021"
-output: html_document
+title: "BCO7000: Session 9"
+subtitle: "⚔<br/>Basic modeling: exploratory data anlysis and linear regression"
+author: "Dr Maria Prokofieva"
+institute: "VU Business School"
+date: "2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["shinobi", "ninjutsu"]
+    seal: true
+    self_contained: false
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false      
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE,   
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.height = 4,
+                      fig.width = 8,
+                      fig.align = "center")
 
+#install.packages("glue")
 library(tidyverse)
-library(tidytuesdayR)
+library(skimr)
+library(lubridate)
 library(scales)
+library(glue)
 theme_set(theme_light())
 ```
+# Modeling
 
-# Decision Trees
+## Exploratory Data Analysis (EDA)
 
-A decision tree is a decision support tool that uses a tree-like model of decisions and their possible consequences, including chance event outcomes, resource costs, and utility. It is one way to display an algorithm that only contains conditional control statements.
+use visualisation and transformation to explore your data in a systematic way
 
-Decision trees can be learned from training data. Training data will typically comprise many instances of the following kind:
+**Steps**:
 
-Instance 1	attribute1	attribute2	...	attributeK	class
-Instance 2	attribute1	attribute2	...	attributeK	class
-The decision tree learning algorithm recursively learns the tree as follows:
+- Generate questions about your data.
 
-Assign all training instances to the root of the tree. Set curent node to root node.
+- Search for answers by visualising, transforming, and modelling your data.
 
-For each attribute
+- Use what you learn to refine your questions and/or generate new questions.
 
-- Partition all data instances at the node by the value of the attribute.
+EDA is not a formal process with a strict set of rules:
 
-- Compute the information gain ratio from the partitioning.
+- investigate every idea that occurs to you
 
-- Identify feature that results in the greatest information gain ratio. Set this feature to be the splitting criterion at the current node.
+EDA is an important part of any data analysis = investigate the quality of your data. 
 
-- If the best information gain ratio is 0, tag the current node as a leaf and return.
+---
+#EDA
 
-- Partition all instances according to attribute value of the best feature.
+Two types of questions to ask to start:
 
-- Denote each partition as a child node of the current node.
+What type of *variation* occurs within my variables?
 
-- For each child node:
+What type of *covariation* occurs between my variables?
 
--If the child node is “pure” (has instances from only one class) tag it as a leaf and return.
+**Variation** is the tendency of the values of a variable to change from measurement to measurement. 
 
--If not set the child node as the current node and recurse to step 2.
+Examples: ?
 
+The best way to understand that pattern is to visualise the distribution of the variable’s values.
 
-## Load the weekly Data
+---
+#Variation in variables
 
-Dowload the weekly data and make available in the `tt` object.
-
+Example of categorical variable
 
 ```{r}
-ikea <-readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-03/ikea.csv') %>%
-  select(-X1) %>%
-  mutate(price_usd = 0.27 * price,
-         short_description = str_squish(short_description)) %>%
-  add_count(category, name = "category_total")
-ikea %>%
-  count(category, sort = TRUE) %>%
-  mutate(category = fct_reorder(category, n)) %>%
-  ggplot(aes(n, category)) +
-  geom_col() +
-  labs(x = "# of items",
-       y = "",
-       title = "Most common categories of IKEA items")
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut), fill="navy")
+
+#compare to
+
+diamonds %>% 
+  count(cut)
+```
+---
+#Variation in variables
+
+Example of continuous variable
+
+A histogram divides the x-axis into equally spaced bins and then uses the height of a bar to display the number of observations that fall in each bin. 
+
+```{r}
+ggplot(data = diamonds) +
+  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
+```
+
+---
+# Variation in variables
+
+Which values are the most common? Why?
+
+Which values are rare? Why? Does that match your expectations?
+
+Can you see any unusual patterns? What might explain them?
+
+*For our example:*
+
+Why are there more diamonds at whole carats and common fractions of carats?
+
+Why are there more diamonds slightly to the right of each peak than there are slightly to the left of each peak?
+
+Why are there no diamonds bigger than 3 carats?
+---
+#Pattern in data
+
+The `faithful` data shows the length (in minutes) of 272 eruptions of the Old Faithful Geyser in Yellowstone National Park. 
+
+Eruption times appear to be clustered into two groups: there are short eruptions (of around 2 minutes) and long eruptions (4-5 minutes), but little in between.
+
+```{r}
+ggplot(data = faithful, mapping = aes(x = eruptions)) + 
+  geom_histogram(binwidth = 0.25)
+```
+---
+#Outliers 
+
+= observations that are unusual
+- data points that don’t seem to fit the pattern. 
+
+- can bedata entry errors or important new science. 
+
+- can be difficult to see in a histogram 
+
+Hint: look for wide limits on the x-axis.
+
+```{r}
+ggplot(diamonds) + 
+  geom_histogram(mapping = aes(x = y), binwidth = 0.5)
+```
+
+---
+#Distribution of a continuous variable
+
+A **boxplot** is a type of visual shorthand for a distribution of values that is popular among statisticians. 
+
+Each boxplot consists of:
+
+1. A box that stretches from the 25th percentile of the distribution to the 75th percentile, a distance known as the *interquartile range* (IQR). 
+
+In the middle of the box is a line that displays the *median*, i.e. 50th percentile, of the distribution. These three lines give you a sense of the spread of the distribution and whether or not the distribution is symmetric about the median or skewed to one side.
+
+- Visual points that display observations that fall more than 1.5 times the IQR from either edge of the box. These outlying points are unusual so are plotted individually.
+
+- A line (or whisker) that extends from each end of the box and goes to the farthest non-outlier point in the distribution.
+
+![ ](img/eda-boxplot.png) 
+---
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) +
+  geom_boxplot()
 ```
 
 ```{r}
-library(glue)
-ikea %>%
-  mutate(category = glue("{ category } ({ category_total })"),
-         category = fct_reorder(category, price_usd)) %>%
-  ggplot(aes(price_usd, category)) +
-  geom_boxplot() +
-  # geom_jitter(width = 0, height = .1, alpha = .25) +
-  scale_x_log10(labels = dollar) +
-  labs(x = "Price (USD)",
-       y = "",
-       title = "How much do items in each category cost?")
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy))
 ```
+---
+use `coord_flip` for longer names
+
 
 ```{r}
-library(ggridges)
-ikea %>%
-  mutate(category = glue("{ category } ({ category_total })"),
-         category = fct_reorder(category, price_usd)) %>%
-  ggplot(aes(price_usd, category)) +
-  geom_density_ridges() +
-  # geom_jitter(width = 0, height = .1, alpha = .25) +
-  scale_x_log10(labels = dollar) +
-  labs(x = "Price (USD)",
-       y = "",
-       title = "How much do items in each category cost?")
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy)) +
+  coord_flip()
 ```
+---
+# Task
+
+Explore the distribution of each of the x, y, and z variables in diamonds. What do you learn? Think about a diamond and how you might decide which dimension is the length, width, and depth.
+
+Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
+
+How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the cause of the difference?
+---
+# Outliers and missing values
+
+Replacing the unusual values with missing values```{r}
+diamonds2 <- diamonds %>% 
+  mutate(y = ifelse(y < 3 | y > 20, NA, y))
+
+Task: use `case_when` to complete the above
+---
+# Using `ggplot2
 
 ```{r}
-ikea %>%
-  mutate(category = glue("{ category } ({ category_total })"),
-         category = fct_reorder(category, price_usd)) %>%
-  ggplot(aes(price_usd, category, fill = other_colors)) +
-  geom_density_ridges(alpha = .5) +
-  # geom_jitter(width = 0, height = .1, alpha = .25) +
-  scale_x_log10(labels = dollar) +
-  labs(x = "Price (USD)",
-       y = "",
-       title = "How much do items in each category cost?")
+ggplot(data = diamonds2, mapping = aes(x = x, y = y)) + 
+  geom_point()
 ```
 
-If we were building a predictive model, we'd probably include both category and other_colors
+or
 
 ```{r}
-ikea %>%
-  mutate(name = fct_lump(name, 20)) %>%
-  filter(name != "Other") %>%
-  count(name, category, sort = TRUE) %>%
-  mutate(name = fct_reorder(name, n, sum),
-         category = fct_reorder(category, n, sum)) %>%
-  ggplot(aes(n, name, fill = category)) +
-  geom_col() +
-  scale_fill_discrete(guide = guide_legend(reverse = TRUE)) +
-  labs(x = "# of items",
-       y = "Name of item")
+ggplot(data = diamonds2, mapping = aes(x = x, y = y)) + 
+  geom_point(na.rm = TRUE)
 ```
+
+---
+#Question
+
+What happens to missing values in a histogram? What happens to missing values in a bar chart? Why is there a difference?
+
+What does `na.rm = TRUE` do in `mean()` and `sum()`?
+---
+#Covariation
+
+= the tendency for the values of two or more variables to vary together in a related way. 
+
+The best way to spot covariation is to visualise the relationship between two or more variables.
 
 ```{r}
-ikea %>%
-  separate(short_description,
-           c("main_description", "rest"),
-           sep = ", ",
-           extra = "merge",
-           fill = "right",
-           remove = FALSE) %>%
-  extract(rest, "description_cm", "([\\d\\-xX]+) cm", remove = FALSE) %>%
-  unite(category_and_description, category, main_description, sep = " - ") %>%
-  count(category_and_description, sort = TRUE)
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_freqpoly(mapping = aes(colour = cut), binwidth = 500)
 ```
+---
+#Covariation
 
-### Volume
+To visualise the covariation between categorical variables, you’ll need to count the number of observations for each combination.
 
 ```{r}
-ikea_volume <- ikea %>%
-  mutate(volume_m3 = depth * height * width / 1e6) %>%
-  filter(!is.na(volume_m3),
-         volume_m3 >= .001) %>%
-  arrange(desc(volume_m3)) %>%
-  add_count(category, name = "category_total")
-ikea_volume %>%
-  arrange(desc(volume_m3))
-ikea_volume %>%
-  mutate(category = glue("{ category } ({ category_total })"),
-         category = fct_reorder(category, volume_m3)) %>%
-  ggplot(aes(volume_m3, category)) +
-  geom_boxplot() +
-  # geom_jitter(width = 0, height = .1, alpha = .25) +
-  scale_x_log10() +
-  labs(x = "Volume of furniture (cubic meters)",
-       y = "",
-       title = "How much space do items in each category take up?")
+ggplot(data = diamonds) +
+  geom_count(mapping = aes(x = cut, y = color))
 ```
 
-What is the highest "price per cubic meter"?
+---
 
 ```{r}
-ikea_volume %>%
-  mutate(category = fct_lump(category, 6)) %>%
-  ggplot(aes(volume_m3, price_usd, color = category)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  scale_x_log10() +
-  scale_y_log10()
-ikea_volume %>%
-  mutate(dollar_per_m3 = price_usd / volume_m3) %>%
-  arrange(desc(dollar_per_m3)) %>%
-  View()
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
 ```
+---
+# Models
+
+If a systematic relationship exists between two variables it will appear as a pattern in the data:
+
+Could this pattern be due to coincidence (i.e. random chance)?
+
+How can you describe the relationship implied by the pattern?
+
+How strong is the relationship implied by the pattern?
+
+What other variables might affect the relationship?
+
+Does the relationship change if you look at individual subgroups of the data?
 
 ```{r}
-ikea %>%
-  group_by(designer) %>%
-  summarize(n_items = n(),
-            n_names = n_distinct(name),
-            n_category = n_distinct(category)) %>%
-  arrange(desc(n_names))
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
 ```
+---
+# Models
+
+All models are wrong, but some are useful.
+
+![ ](img/model.png) 
+
+---
+# Basic models
+
+- regression models
+
+- classification models
+---
+# Linear regression
+
+is one of the simplest and most common supervised machine learning algorithms that data scientists use for predictive modeling.
+
+Aim: to model a continuous variable Y as a mathematical function of one or more X variable(s), so that we can use this regression model to predict the Y when only the X is known:
+
+Y = β1 + β2X1 + ϵ
+
+Height = b1 +b2 age + b3 nationality + b4 parents + b5 height of neighbors
+
+where, β1 is the intercept and β2 is the slope. 
+
+Collectively, they are called regression coefficients. ϵ is the error term, the part of Y the regression model is unable to explain.
+
+---
+# Linear regression
+
+Linear regression assumes that there exists a linear relationship between the response variable and the explanatory variables. 
+
+This means that you can fit a line between the two (or more variables). 
+
+![ ](img/lm.png) 
+---
+# Linear regression
+
+![ ](img/lm-ex.png) 
+you can calculate the height of a child if you know her age:
+
+Height=a+Age∗b
+In this case, “a” and “b” are called the intercept and the slope respectively. With the same example, “a” or the intercept, is the value from where you start measuring. Newborn babies with zero months are not zero centimeters necessarily; this is the function of the intercept. The slope measures the change of height with respect to the age in months. In general, for every month older the child is, his or her height will increase with “b”.
+
+---
+# Linear regression in R
+
+A linear regression can be calculated in R with the command `lm`
 
 ```{r}
-library(broom)
-ikea_volume %>%
-  mutate(category = fct_relevel(category, "Tables & desks")) %>%
-  lm(log2(price_usd) ~ log2(volume_m3) + category + other_colors, data = .) %>%
-  tidy(conf.int = TRUE) %>%
-  filter(term != "(Intercept)") %>%
-  mutate(term = ifelse(term == "log2(volume_m3)", "Item volume (doubling)", term),
-         term = str_remove(term, "^category")) %>%
-  mutate(term = fct_reorder(term, estimate)) %>%
-  ggplot(aes(estimate, term)) +
-  geom_point() +
-  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = .1) +
-  geom_vline(xintercept = 0, color = "red", lty = 2) +
-  labs(x = "Impact on price (relative to Tables & desks)",
-       y = "",
-       title = "What objects are unusually expensive/inexpensive relative to volume?")
-```
+library(readxl)
+ageandheight <- read_excel("ageandheight.xls", sheet = "Hoja2") #Upload the data
+lmHeight = lm(height~age, data = ageandheight) #Create the linear regression
+summary(lmHeight) #Review the results
