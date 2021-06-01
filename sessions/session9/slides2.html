@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>BCO7000: Session 9</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr Maria Prokofieva" />
+    <meta name="date" content="2021-01-01" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/shinobi.css" rel="stylesheet" />
+    <link href="libs/remark-css/ninjutsu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# BCO7000: Session 9
+## ⚔<br/>Basic modeling: exploratory data anlysis and linear regression
+### Dr Maria Prokofieva
+### VU Business School
+### 2021
+
+---
+
+
+
+# Modeling- Covariation
+
+= the tendency for the values of two or more variables to vary together in a related way. 
+
+The best way to spot covariation is to visualise the relationship between two or more variables.
+
+
+```r
+ggplot(data = diamonds, mapping = aes(x = price)) + 
+  geom_freqpoly(mapping = aes(colour = cut), binwidth = 500)
+```
+
+&lt;img src="slides2_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+---
+#Covariation
+
+To visualise the covariation between categorical variables, you’ll need to count the number of observations for each combination.
+
+
+```r
+ggplot(data = diamonds) +
+  geom_count(mapping = aes(x = cut, y = color))
+```
+
+&lt;img src="slides2_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
+```
+
+&lt;img src="slides2_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+---
+
+# Models
+
+If a systematic relationship exists between two variables it will appear as a pattern in the data:
+
+Could this pattern be due to coincidence (i.e. random chance)?
+
+How can you describe the relationship implied by the pattern?
+
+How strong is the relationship implied by the pattern?
+
+What other variables might affect the relationship?
+
+Does the relationship change if you look at individual subgroups of the data?
+
+
+```r
+ggplot(data = diamonds) + 
+  geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
+```
+
+&lt;img src="slides2_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+---
+# Models
+
+All models are wrong, but some are useful.
+
+![ ](img/model.png) 
+
+---
+# Basic models
+
+- regression models
+
+- classification models
+---
+# Linear regression
+
+is one of the simplest and most common supervised machine learning algorithms that data scientists use for predictive modeling.
+
+Aim: to model a continuous variable Y as a mathematical function of one or more X variable(s), so that we can use this regression model to predict the Y when only the X is known:
+
+Y = β1 + β2X1 + ϵ
+
+Height = b1 +b2 age + b3 nationality + b4 parents + b5 height of neighbors
+
+where, β1 is the intercept and β2 is the slope. 
+
+Collectively, they are called regression coefficients. ϵ is the error term, the part of Y the regression model is unable to explain.
+
+---
+# Linear regression
+
+Linear regression assumes that there exists a linear relationship between the response variable and the explanatory variables. 
+
+This means that you can fit a line between the two (or more variables). 
+
+![ ](img/lm.png) 
+---
+# Linear regression
+
+![ ](img/lm-ex.png) 
+you can calculate the height of a child if you know her age:
+
+Height=a+Age∗b
+In this case, “a” and “b” are called the intercept and the slope respectively. With the same example, “a” or the intercept, is the value from where you start measuring. Newborn babies with zero months are not zero centimeters necessarily; this is the function of the intercept. The slope measures the change of height with respect to the age in months. In general, for every month older the child is, his or her height will increase with “b”.
+
+---
+# Linear regression in R
+
+A linear regression can be calculated in R with the command `lm`
+
+
+```r
+library(readxl)
+ageandheight &lt;- read_excel("ageandheight.xls", sheet = "Hoja2") #Upload the data
+lmHeight = lm(height~age, data = ageandheight) #Create the linear regression
+summary(lmHeight) #Review the results
+```
+
+```
+## 
+## Call:
+## lm(formula = height ~ age, data = ageandheight)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -66.059   5.193   5.810   6.617   7.533 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  64.8445    43.3815   1.495    0.166
+## age           0.3835     1.8264   0.210    0.838
+## 
+## Residual standard error: 21.84 on 10 degrees of freedom
+## Multiple R-squared:  0.00439,	Adjusted R-squared:  -0.09517 
+## F-statistic: 0.0441 on 1 and 10 DF,  p-value: 0.8379
+```
+---
+# Coefficients
+
+values of the intercept (“a” value) and the slope (“b” value) for the age. 
+
+These “a” and “b” values plot a line between all the points of the data
+
+e.g if there is a child that is 20.5 months old, a is 64.92 and b is 0.635, the model predicts (on average) that its height in centimeters is around 64.92 + (0.635 * 20.5) = 77.93 cm.
+---
+# Multiple linear regression
+
+a regression takes into account two or more predictors to create the linear regression
+
+Height = a + Age × b1 + (Number of Siblings} × b2
+
+
+```r
+lmHeight2 = lm(height~age + no_siblings, data = ageandheight) #Create a linear regression with two variables
+summary(lmHeight2) #Review the results
+```
+
+```
+## 
+## Call:
+## lm(formula = height ~ age + no_siblings, data = ageandheight)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -47.808  -4.521   1.002  10.025  21.186 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)   56.597     39.166   1.445   0.1823  
+## age            1.303      1.712   0.761   0.4660  
+## no_siblings   -6.415      3.464  -1.852   0.0971 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 19.59 on 9 degrees of freedom
+## Multiple R-squared:  0.2791,	Adjusted R-squared:  0.1189 
+## F-statistic: 1.742 on 2 and 9 DF,  p-value: 0.2293
+```
+
+---
+# p-value
+
+a p-value indicates whether or not you can reject or accept a hypothesis. The hypothesis, in this case, is that the predictor is not meaningful for your model.
+
+The p-value for age is 4.34*e-10 or 0.000000000434. A very small value means that age is probably an excellent addition to your model.
+
+The p-value for the number of siblings is 0.85. In other words, there’s 85% chance that this predictor is not meaningful for the regression.
+
+A standard way to test if the predictors are not meaningful is looking if the p-values smaller than 0.05.
+
+---
+# Residuals
+
+the differences between the real values and the predicted values. 
+
+The straight line in the image above represents the predicted values. The red vertical line from the straight line to the observed data value is the residual.
+
+Hint: keep the sum of the residuals is approximately zero or as low as possible
+ 
+![ ](img/res.png) 
+---
+# How to test if your linear model has a good fit?
+
+
+the coefficient of determination or R². This measure is defined by the proportion of the total variability explained by the regression model.
+
+R2=Explained Variation of the model/ Total variation of the model
+
+In general, for models that fit the data well, R² is near 1. 
+
+Models that poorly fit the data have R² near 0. 
+
+In the examples below, the first one has an R² of 0.02; this means that the model explains only 2% of the data variability. 
+
+The second one has an R² of 0.99, and the model can explain 99% of the total variability.**
+
+---
+![ ](img/res2.png) 
+---
+# Don’t forget to look at the residuals!
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
