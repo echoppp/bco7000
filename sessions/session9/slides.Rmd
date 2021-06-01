@@ -127,12 +127,9 @@ ggplot(data = faithful, mapping = aes(x = eruptions)) +
 
 = observations that are unusual
 - data points that don’t seem to fit the pattern. 
-
 - can bedata entry errors or important new science. 
-
 - can be difficult to see in a histogram 
-
-Hint: look for wide limits on the x-axis.
+*Hint*: look for wide limits on the x-axis.
 
 ```{r}
 ggplot(diamonds) + 
@@ -154,18 +151,44 @@ In the middle of the box is a line that displays the *median*, i.e. 50th percent
 
 - A line (or whisker) that extends from each end of the box and goes to the farthest non-outlier point in the distribution.
 
+---
+# Boxplot:
+
 ![ ](img/eda-boxplot.png) 
 ---
+# Boxplot:
+
 ```{r}
 ggplot(data = diamonds, mapping = aes(x = cut, y = price)) +
   geom_boxplot()
 ```
 
+**Task**: identify quantiles, median, whiskers and outliers. What does this boxplot tell us about data?
+---
+# Boxplot:
+
 ```{r}
+
+data(mpg)
 ggplot(data = mpg) +
   geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy))
 ```
+
+**Task**: identify quantiles, median, whiskers and outliers. What does this boxplot tell us about data?
+
+What does `reorder` do? Why do we use `FUN = median`?
+
 ---
+```{r}
+
+data(mpg)
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy))
+```
+Reordering factor based on their medians to make it look prettier!
+---
+# Hint:
+
 use `coord_flip` for longer names
 
 
@@ -185,10 +208,12 @@ How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the
 ---
 # Outliers and missing values
 
-Replacing the unusual values with missing values```{r}
+Replacing the unusual values with missing values
+
+```{r}
 diamonds2 <- diamonds %>% 
   mutate(y = ifelse(y < 3 | y > 20, NA, y))
-
+```
 Task: use `case_when` to complete the above
 ---
 # Using `ggplot2
@@ -199,6 +224,7 @@ ggplot(data = diamonds2, mapping = aes(x = x, y = y)) +
 ```
 
 or
+---
 
 ```{r}
 ggplot(data = diamonds2, mapping = aes(x = x, y = y)) + 
@@ -206,13 +232,13 @@ ggplot(data = diamonds2, mapping = aes(x = x, y = y)) +
 ```
 
 ---
-#Question
+# Question
 
 What happens to missing values in a histogram? What happens to missing values in a bar chart? Why is there a difference?
 
 What does `na.rm = TRUE` do in `mean()` and `sum()`?
 ---
-#Covariation
+# Covariation
 
 = the tendency for the values of two or more variables to vary together in a related way. 
 
@@ -239,6 +265,7 @@ ggplot(data = diamonds) +
   geom_point(mapping = aes(x = carat, y = price), alpha = 1 / 100)
 ```
 ---
+
 # Models
 
 If a systematic relationship exists between two variables it will appear as a pattern in the data:
@@ -275,15 +302,15 @@ All models are wrong, but some are useful.
 
 is one of the simplest and most common supervised machine learning algorithms that data scientists use for predictive modeling.
 
-Aim: to model a continuous variable Y as a mathematical function of one or more X variable(s), so that we can use this regression model to predict the Y when only the X is known:
+Aim: to model a continuous variable `y` as a mathematical function of one or more `x` variable(s), so that we can use this regression model to predict the `y` when only the `x` is known:
 
-Y = β1 + β2X1 + ϵ
+y= b1 + b2*x1+error
 
-Height = b1 +b2 age + b3 nationality + b4 parents + b5 height of neighbors
+Height = b1 +b2 age + b3 nationality + b4 parents + b5 height of neighbors
 
-where, β1 is the intercept and β2 is the slope. 
+where, b1 is the intercept and b2 is the slope. 
 
-Collectively, they are called regression coefficients. ϵ is the error term, the part of Y the regression model is unable to explain.
+Collectively, they are called regression coefficients, error is the error term, the part of y the regression model is unable to explain.
 
 ---
 # Linear regression
@@ -300,6 +327,7 @@ This means that you can fit a line between the two (or more variables).
 you can calculate the height of a child if you know her age:
 
 Height=a+Age∗b
+
 In this case, “a” and “b” are called the intercept and the slope respectively. With the same example, “a” or the intercept, is the value from where you start measuring. Newborn babies with zero months are not zero centimeters necessarily; this is the function of the intercept. The slope measures the change of height with respect to the age in months. In general, for every month older the child is, his or her height will increase with “b”.
 
 ---
@@ -308,7 +336,72 @@ In this case, “a” and “b” are called the intercept and the slope respect
 A linear regression can be calculated in R with the command `lm`
 
 ```{r}
+
 library(readxl)
 ageandheight <- read_excel("ageandheight.xls", sheet = "Hoja2") #Upload the data
 lmHeight = lm(height~age, data = ageandheight) #Create the linear regression
 summary(lmHeight) #Review the results
+```
+---
+# Coefficients
+
+values of the intercept (“a” value) and the slope (“b” value) for the age. 
+
+These “a” and “b” values plot a line between all the points of the data
+
+e.g if there is a child that is 20.5 months old, a is 64.92 and b is 0.635, the model predicts (on average) that its height in centimeters is around 64.92 + (0.635 * 20.5) = 77.93 cm.
+---
+# Multiple linear regression
+
+a regression takes into account two or more predictors to create the linear regression
+
+Height = a + Age × b1 + (Number of Siblings} × b2
+
+```{r}
+lmHeight2 = lm(height~age + no_siblings, data = ageandheight) #Create a linear regression with two variables
+summary(lmHeight2) #Review the results
+```
+
+---
+# p-value
+
+a p-value indicates whether or not you can reject or accept a hypothesis. The hypothesis, in this case, is that the predictor is not meaningful for your model.
+
+The p-value for age is 4.34*e-10 or 0.000000000434. A very small value means that age is probably an excellent addition to your model.
+
+The p-value for the number of siblings is 0.85. In other words, there’s 85% chance that this predictor is not meaningful for the regression.
+
+A standard way to test if the predictors are not meaningful is looking if the p-values smaller than 0.05.
+
+---
+# Residuals
+
+the differences between the real values and the predicted values. 
+
+The straight line in the image above represents the predicted values. The red vertical line from the straight line to the observed data value is the residual.
+
+Hint: keep the sum of the residuals is approximately zero or as low as possible
+ 
+![ ](img/res.png) 
+---
+# How to test if your linear model has a good fit?
+
+
+the coefficient of determination or R². This measure is defined by the proportion of the total variability explained by the regression model.
+
+R2=Explained Variation of the model/ Total variation of the model
+
+In general, for models that fit the data well, R² is near 1. 
+
+Models that poorly fit the data have R² near 0. 
+
+In the examples below, the first one has an R² of 0.02; this means that the model explains only 2% of the data variability. 
+
+The second one has an R² of 0.99, and the model can explain 99% of the total variability.**
+
+---
+![ ](img/res2.png) 
+---
+# Don’t forget to look at the residuals!
+
+
