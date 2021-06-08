@@ -40,7 +40,9 @@ The **input** variables can  be either continuous or categorical or a mix, but t
 **output** variable should be a category
 
 *Examples*: 
+
 Given an example, classify if an email is spam or not. 
+
 Given a handwritten character, classify it as one of the known characters.
 
 The model that allows to "classify" an object based on other variables is called a **classifier**.
@@ -186,6 +188,10 @@ library(caret)
 ##     lift
 ```
 
+```r
+set.seed(123)
+```
+
 Review the documentation for the library at CRAN.
 
 Read about the dataset `PimaIndiansDiabetes2`
@@ -216,8 +222,8 @@ summary(model)$coef
 
 ```
 ##                Estimate  Std. Error   z value     Pr(&gt;|z|)
-## (Intercept) -7.07654962 0.775947273 -9.119885 7.520434e-20
-## glucose      0.04945579 0.005787787  8.544852 1.287006e-17
+## (Intercept) -6.15882009 0.700096646 -8.797100 1.403974e-18
+## glucose      0.04327234 0.005341133  8.101716 5.418949e-16
 ```
 
 ```r
@@ -229,8 +235,8 @@ tidy(model)
 ## # A tibble: 2 x 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)  -7.08     0.776       -9.12 7.52e-20
-## 2 glucose       0.0495   0.00579      8.54 1.29e-17
+## 1 (Intercept)  -6.16     0.700       -8.80 1.40e-18
+## 2 glucose       0.0433   0.00534      8.10 5.42e-16
 ```
 ---
 
@@ -242,40 +248,45 @@ tidy(model)
 ## # A tibble: 2 x 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)  -7.08     0.776       -9.12 7.52e-20
-## 2 glucose       0.0495   0.00579      8.54 1.29e-17
+## 1 (Intercept)  -6.16     0.700       -8.80 1.40e-18
+## 2 glucose       0.0433   0.00534      8.10 5.42e-16
 ```
-The intercept (b0) is -6.32 and the coefficient of glucose variable is 0.043.
+The intercept (b0) is -6.16 and the coefficient of glucose variable is 0.043.
 
 The logistic equation can be written as
-p = exp(-6.32 + 0.043* glucose)/ [1 + exp(-6.32 + 0.043* glucose)]. 
+p = exp(-6.16 + 0.043* glucose)/ [1 + exp(-6.16 + 0.043* glucose)]. 
 
 Using this formula, for each new glucose plasma concentration value, you can predict the probability of the individuals in being diabetes positive.
 
 ---
+#Prediction
+
 Predictions can be easily made using the function `predict()`. Use the option type = “response” to directly obtain the probabilities
 
 
 ```r
 probabilities &lt;- model %&gt;% predict(test_data, type = "response")
-predicted.classes &lt;- ifelse(probabilities &gt; 0.5, "pos", "neg")
-predicted.classes
+predicted_classes &lt;- ifelse(probabilities &gt; 0.5, "pos", "neg")
+predicted_classes
 ```
 
 ```
-##     5     7    28    51    60    72    74    86    93    99   106   110   121 
-## "neg" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "pos" 
-##   126   129   133   140   143   148   159   166   170   190   205   216   217 
-## "neg" "neg" "pos" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "pos" "neg" 
-##   218   237   248   259   266   298   306   309   326   327   330   342   347 
-## "neg" "pos" "pos" "pos" "neg" "neg" "neg" "neg" "pos" "neg" "neg" "neg" "neg" 
-##   359   360   391   397   406   410   412   422   449   450   466   467   487 
-## "neg" "pos" "neg" "neg" "neg" "pos" "neg" "neg" "neg" "neg" "neg" "neg" "neg" 
-##   517   521   542   549   566   569   574   592   610   618   621   640   649 
-## "pos" "neg" "neg" "pos" "neg" "pos" "neg" "neg" "neg" "neg" "neg" "neg" "neg" 
-##   653   660   666   680   683   690   694   710   714   727   731   741   745 
-## "neg" "neg" "neg" "neg" "neg" "pos" "neg" "neg" "neg" "neg" "neg" "neg" "pos"
+##    19    21    32    55    64    71    72    74    98    99   108   111   115 
+## "neg" "neg" "pos" "pos" "neg" "neg" "neg" "neg" "neg" "neg" "pos" "pos" "pos" 
+##   128   154   182   215   216   224   229   260   293   297   313   316   326 
+## "neg" "pos" "neg" "neg" "pos" "neg" "pos" "pos" "neg" "pos" "pos" "neg" "pos" 
+##   357   369   376   385   386   393   394   410   429   447   450   453   468 
+## "neg" "neg" "neg" "neg" "neg" "neg" "neg" "pos" "neg" "neg" "neg" "neg" "neg" 
+##   470   477   487   541   542   546   552   555   556   562   563   564   577 
+## "pos" "neg" "neg" "neg" "neg" "pos" "neg" "neg" "neg" "pos" "neg" "neg" "neg" 
+##   589   592   595   600   609   610   621   634   666   673   674   681   683 
+## "pos" "neg" "neg" "neg" "pos" "neg" "neg" "neg" "neg" "neg" "neg" "neg" "neg" 
+##   694   697   699   710   716   717   719   722   731   733   734   746   766 
+## "neg" "pos" "neg" "neg" "pos" "pos" "neg" "neg" "neg" "pos" "neg" "neg" "neg"
 ```
+
+Think about  how to use `predict()` with more than 2 categories of responses
+
 ---
 To visualise:
 
@@ -313,10 +324,10 @@ tidy(model)
 ## # A tibble: 4 x 5
 ##   term        estimate std.error statistic  p.value
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)  -9.70     1.16        -8.37 6.00e-17
-## 2 glucose       0.0450   0.00583      7.72 1.16e-14
-## 3 mass          0.0771   0.0238       3.24 1.21e- 3
-## 4 pregnant      0.159    0.0471       3.38 7.20e- 4
+## 1 (Intercept)  -9.32     1.13        -8.28 1.23e-16
+## 2 glucose       0.0389   0.00540      7.19 6.43e-13
+## 3 mass          0.0946   0.0235       4.02 5.83e- 5
+## 4 pregnant      0.145    0.0451       3.21 1.35e- 3
 ```
 ---
 Here, we want to include all the predictor variables available in the data set. This is done using ~.:
@@ -330,19 +341,18 @@ tidy(model)
 ## # A tibble: 9 x 5
 ##   term          estimate std.error statistic  p.value
 ##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept) -10.9        1.43      -7.61   2.68e-14
-## 2 pregnant      0.0951     0.0644     1.48   1.40e- 1
-## 3 glucose       0.0439     0.00677    6.49   8.78e-11
-## 4 pressure      0.00255    0.0143     0.179  8.58e- 1
-## 5 triceps       0.0125     0.0197     0.635  5.26e- 1
-## 6 insulin      -0.000123   0.00150   -0.0824 9.34e- 1
-## 7 mass          0.0625     0.0322     1.94   5.24e- 2
-## 8 pedigree      0.998      0.506      1.97   4.86e- 2
-## 9 age           0.0303     0.0212     1.43   1.53e- 1
+## 1 (Intercept) -10.5        1.44      -7.32   2.54e-13
+## 2 pregnant      0.101      0.0613     1.64   1.01e- 1
+## 3 glucose       0.0371     0.00649    5.72   1.07e- 8
+## 4 pressure     -0.000388   0.0138    -0.0280 9.78e- 1
+## 5 triceps       0.0142     0.0200     0.710  4.78e- 1
+## 6 insulin       0.000594   0.00151    0.394  6.94e- 1
+## 7 mass          0.0800     0.0318     2.52   1.19e- 2
+## 8 pedigree      1.33       0.482      2.76   5.85e- 3
+## 9 age           0.0272     0.0202     1.35   1.78e- 1
 ```
 ---
 #Interpretation
-
 
 *Estimate*: the intercept (b0) and the beta coefficient estimates associated to each predictor variable
 
@@ -361,9 +371,9 @@ coef(model)
 
 ```
 ##   (Intercept)      pregnant       glucose      pressure       triceps 
-## -1.087700e+01  9.508021e-02  4.391056e-02  2.550560e-03  1.247292e-02 
+## -1.053400e+01  1.005031e-01  3.709621e-02 -3.875933e-04  1.417771e-02 
 ##       insulin          mass      pedigree           age 
-## -1.234563e-04  6.248319e-02  9.982695e-01  3.025300e-02
+##  5.939876e-04  7.997447e-02  1.329149e+00  2.718224e-02
 ```
 
 ```r
@@ -372,15 +382,15 @@ summary(model )$coef
 
 ```
 ##                  Estimate  Std. Error     z value     Pr(&gt;|z|)
-## (Intercept) -1.087700e+01 1.428744512 -7.61298029 2.678467e-14
-## pregnant     9.508021e-02 0.064433404  1.47563536 1.400418e-01
-## glucose      4.391056e-02 0.006769372  6.48665137 8.776510e-11
-## pressure     2.550560e-03 0.014272697  0.17870203 8.581717e-01
-## triceps      1.247292e-02 0.019656292  0.63455097 5.257213e-01
-## insulin     -1.234563e-04 0.001499003 -0.08235892 9.343613e-01
-## mass         6.248319e-02 0.032205546  1.94013750 5.236298e-02
-## pedigree     9.982695e-01 0.506207845  1.97205460 4.860337e-02
-## age          3.025300e-02 0.021176562  1.42860750 1.531171e-01
+## (Intercept) -1.053400e+01 1.439679266 -7.31690975 2.537464e-13
+## pregnant     1.005031e-01 0.061266974  1.64041157 1.009196e-01
+## glucose      3.709621e-02 0.006486093  5.71934633 1.069346e-08
+## pressure    -3.875933e-04 0.013826185 -0.02803328 9.776356e-01
+## triceps      1.417771e-02 0.019981885  0.70952823 4.779967e-01
+## insulin      5.939876e-04 0.001508231  0.39383055 6.937061e-01
+## mass         7.997447e-02 0.031798907  2.51500698 1.190300e-02
+## pedigree     1.329149e+00 0.482291020  2.75590704 5.852963e-03
+## age          2.718224e-02 0.020199295  1.34570257 1.783985e-01
 ```
 
 ```r
@@ -392,15 +402,15 @@ tidy(model)
 ## # A tibble: 9 x 5
 ##   term          estimate std.error statistic  p.value
 ##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept) -10.9        1.43      -7.61   2.68e-14
-## 2 pregnant      0.0951     0.0644     1.48   1.40e- 1
-## 3 glucose       0.0439     0.00677    6.49   8.78e-11
-## 4 pressure      0.00255    0.0143     0.179  8.58e- 1
-## 5 triceps       0.0125     0.0197     0.635  5.26e- 1
-## 6 insulin      -0.000123   0.00150   -0.0824 9.34e- 1
-## 7 mass          0.0625     0.0322     1.94   5.24e- 2
-## 8 pedigree      0.998      0.506      1.97   4.86e- 2
-## 9 age           0.0303     0.0212     1.43   1.53e- 1
+## 1 (Intercept) -10.5        1.44      -7.32   2.54e-13
+## 2 pregnant      0.101      0.0613     1.64   1.01e- 1
+## 3 glucose       0.0371     0.00649    5.72   1.07e- 8
+## 4 pressure     -0.000388   0.0138    -0.0280 9.78e- 1
+## 5 triceps       0.0142     0.0200     0.710  4.78e- 1
+## 6 insulin       0.000594   0.00151    0.394  6.94e- 1
+## 7 mass          0.0800     0.0318     2.52   1.19e- 2
+## 8 pedigree      1.33       0.482      2.76   5.85e- 3
+## 9 age           0.0272     0.0202     1.35   1.78e- 1
 ```
 
 ```r
@@ -412,13 +422,13 @@ augment(model)
 ##    .rownames diabetes pregnant glucose pressure triceps insulin  mass pedigree
 ##    &lt;chr&gt;     &lt;fct&gt;       &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
 ##  1 4         neg             1      89       66      23      94  28.1    0.167
-##  2 9         pos             2     197       70      45     543  30.5    0.158
-##  3 14        pos             1     189       60      23     846  30.1    0.398
-##  4 15        pos             5     166       72      19     175  25.8    0.587
-##  5 17        pos             0     118       84      47     230  45.8    0.551
-##  6 19        neg             1     103       30      38      83  43.3    0.183
-##  7 20        pos             1     115       70      30      96  34.6    0.529
-##  8 21        neg             3     126       88      41     235  39.3    0.704
+##  2 5         pos             0     137       40      35     168  43.1    2.29 
+##  3 7         pos             3      78       50      32      88  31      0.248
+##  4 9         pos             2     197       70      45     543  30.5    0.158
+##  5 14        pos             1     189       60      23     846  30.1    0.398
+##  6 15        pos             5     166       72      19     175  25.8    0.587
+##  7 17        pos             0     118       84      47     230  45.8    0.551
+##  8 20        pos             1     115       70      30      96  34.6    0.529
 ##  9 25        pos            11     143       94      33     146  36.6    0.254
 ## 10 26        pos            10     125       70      26     115  31.1    0.205
 ## # … with 304 more rows, and 7 more variables: age &lt;dbl&gt;, .fitted &lt;dbl&gt;,
@@ -434,22 +444,26 @@ The coefficient estimate of the variable glucose is b = 0.045, which is positive
 This means that an increase in glucose is associated with increase in the probability of being diabetes-positive. 
 
 The coefficient for the variable pressure is b = -0.007, which is negative. This means that an increase in blood pressure will be associated with a decreased probability of being diabetes-positive.
+---
 
-**Important** logistic beta coefficient is the odds ratio. 
+#**Important** logistic beta coefficient is the odds ratio. 
 
-An odds ratio measures the association between a predictor variable (x) and the outcome variable (y). 
+An odds ratio measures the association between a *predictor* variable (x) and the *outcome* variable (y). 
 
 It represents the ratio of the odds that an event will occur (event = 1) given the presence of the predictor x (x = 1), compared to the odds of the event occurring in the absence of that predictor (x = 0).
 
-For a given predictor (say x1), the associated beta coefficient (b1) in the logistic regression function corresponds to the log of the odds ratio for that predictor.
+For a given predictor (e.g x1), the associated beta coefficient (b1) in the logistic regression function corresponds to the log of the odds ratio for that predictor.
 
 If the odds ratio is 2, then the odds that the event occurs (event = 1) are two times higher when the predictor x is present (x = 1) versus x is absent (x = 0).
 
 For example, the regression coefficient for glucose is 0.042. This indicate that one unit increase in the glucose concentration will increase the odds of being diabetes-positive by exp(0.042) 1.04 times.
 
 From the logistic regression results, it can be noticed that some variables - triceps, insulin and age - are not statistically significant = they should be eliminated. 
+---
+#Significant predictors
 
 Select manually the most significant:
+
 
 ```r
 model &lt;- glm( diabetes ~ pregnant + glucose + pressure + mass + pedigree, 
@@ -464,12 +478,13 @@ The *classification error* is defined as the proportion of observations that hav
 
 Proportion of correctly classified observations:
 
+
 ```r
-mean(predicted.classes == test_data$diabetes)
+mean(predicted_classes == test_data$diabetes)
 ```
 
 ```
-## [1] 0.6923077
+## [1] 0.7692308
 ```
 
 The classification prediction accuracy is about 76%, which is good. 

@@ -44,7 +44,9 @@ The **input** variables can  be either continuous or categorical or a mix, but t
 **output** variable should be a category
 
 *Examples*: 
+
 Given an example, classify if an email is spam or not. 
+
 Given a handwritten character, classify it as one of the known characters.
 
 The model that allows to "classify" an object based on other variables is called a **classifier**.
@@ -171,6 +173,8 @@ mean(predicted.classes == test.data$outcome)
 #install.packages("caret")
 library(mlbench)
 library(caret)
+set.seed(123)
+
 ```
 
 Review the documentation for the library at CRAN.
@@ -204,21 +208,26 @@ tidy(model)
 ```{r}
 tidy(model)
 ```
-The intercept (b0) is -6.32 and the coefficient of glucose variable is 0.043.
+The intercept (b0) is -6.16 and the coefficient of glucose variable is 0.043.
 
 The logistic equation can be written as
-p = exp(-6.32 + 0.043* glucose)/ [1 + exp(-6.32 + 0.043* glucose)]. 
+p = exp(-6.16 + 0.043* glucose)/ [1 + exp(-6.16 + 0.043* glucose)]. 
 
 Using this formula, for each new glucose plasma concentration value, you can predict the probability of the individuals in being diabetes positive.
 
 ---
+#Prediction
+
 Predictions can be easily made using the function `predict()`. Use the option type = “response” to directly obtain the probabilities
 
 ```{r}
 probabilities <- model %>% predict(test_data, type = "response")
-predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
-predicted.classes
+predicted_classes <- ifelse(probabilities > 0.5, "pos", "neg")
+predicted_classes
 ```
+
+Think about  how to use `predict()` with more than 2 categories of responses
+
 ---
 To visualise:
 ```{r}
@@ -253,7 +262,6 @@ tidy(model)
 ---
 #Interpretation
 
-
 *Estimate*: the intercept (b0) and the beta coefficient estimates associated to each predictor variable
 
 *Std.Error*: the standard error of the coefficient estimates. This represents the accuracy of the coefficients. The larger the standard error, the less confident we are about the estimate.
@@ -281,22 +289,26 @@ The coefficient estimate of the variable glucose is b = 0.045, which is positive
 This means that an increase in glucose is associated with increase in the probability of being diabetes-positive. 
 
 The coefficient for the variable pressure is b = -0.007, which is negative. This means that an increase in blood pressure will be associated with a decreased probability of being diabetes-positive.
+---
 
-**Important** logistic beta coefficient is the odds ratio. 
+#**Important** logistic beta coefficient is the odds ratio. 
 
-An odds ratio measures the association between a predictor variable (x) and the outcome variable (y). 
+An odds ratio measures the association between a *predictor* variable (x) and the *outcome* variable (y). 
 
 It represents the ratio of the odds that an event will occur (event = 1) given the presence of the predictor x (x = 1), compared to the odds of the event occurring in the absence of that predictor (x = 0).
 
-For a given predictor (say x1), the associated beta coefficient (b1) in the logistic regression function corresponds to the log of the odds ratio for that predictor.
+For a given predictor (e.g x1), the associated beta coefficient (b1) in the logistic regression function corresponds to the log of the odds ratio for that predictor.
 
 If the odds ratio is 2, then the odds that the event occurs (event = 1) are two times higher when the predictor x is present (x = 1) versus x is absent (x = 0).
 
 For example, the regression coefficient for glucose is 0.042. This indicate that one unit increase in the glucose concentration will increase the odds of being diabetes-positive by exp(0.042) 1.04 times.
 
 From the logistic regression results, it can be noticed that some variables - triceps, insulin and age - are not statistically significant = they should be eliminated. 
+---
+#Significant predictors
 
 Select manually the most significant:
+
 ```{r}
 model <- glm( diabetes ~ pregnant + glucose + pressure + mass + pedigree, 
                 data = train_data, family = binomial)
@@ -309,8 +321,9 @@ The *model accuracy* is measured as the proportion of observations that have bee
 The *classification error* is defined as the proportion of observations that have been misclassified.
 
 Proportion of correctly classified observations:
+
 ```{r}
-mean(predicted.classes == test_data$diabetes)
+mean(predicted_classes == test_data$diabetes)
 ```
 
 The classification prediction accuracy is about 76%, which is good. 
