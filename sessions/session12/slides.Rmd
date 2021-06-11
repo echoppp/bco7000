@@ -1,0 +1,180 @@
+---
+title: "Session 12 - Case Study"
+author: "Maria Prokofieva"
+date: "09/06/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(scales)
+library(lubridate)
+theme_set(theme_light())
+```
+
+#Case study
+
+Plan:
+
+- Prepare for your submission of the final report
+
+- Have your data ready and look for ideas!
+
+
+**Dataset**: [Ask a Manager Survey](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-05-18/readme.md)
+
+## Load the weekly Data
+
+Dowload the weekly data and make available in the `tt` object.
+
+```{r Load}
+survey <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-05-18/survey.csv')
+```
+
+**Tasks**
+
+- Investigate/refresh the use of `fct_relevel()`, `fct_reorder()`, `fct_reorder`,`fct_collapse()`
+
+- Investigate/refresh the use of `str_replace()`and `parse_number()`
+
+- Investigate the use of `coalesce()`
+
+
+```{r eval=FALSE}
+survey%>%
+  mutate(country=fct_lump_n(country, 5))%>%
+  count(country, sort=TRUE)
+
+#recording and transforming variables
+survey <- survey %>%
+  mutate(timestamp = mdy_hms(timestamp),
+         age_category = fct_relevel(fct_reorder(how_old_are_you, parse_number(how_old_are_you)), "under 18"),
+         experience_overall = str_replace(overall_years_of_professional_experience, " - ", "-"),
+         experience_overall = fct_reorder(experience_overall, parse_number(experience_overall)),
+         experience_in_field = str_replace(years_of_experience_in_field, " - ", "-"),
+         experience_in_field = fct_reorder(experience_in_field, parse_number(experience_in_field))) 
+
+#recording and transforming variables for gender and race variables
+survey <- survey %>%
+  mutate(gender = fct_collapse(coalesce(gender, "Other or prefer not to answer"), "Other or prefer not to answer" = c("Other or prefer not to answer", "Prefer not to answer")),
+         race = fct_lump(coalesce(race, "Other"), 4))
+
+#let's do some basic investigation
+survey %>%
+  count(years_of_experience_in_field)
+
+survey %>%
+  count(industry, sort = TRUE)
+
+survey %>%
+  count(job_title, sort = TRUE)
+
+survey %>%
+  count(currency, sort = TRUE)
+```
+
+
+- Investigate the use of `str_remove()`
+
+```{r}
+survey_usd <- survey %>%
+  filter(currency == "USD") %>%
+  filter(annual_salary >= 5000,
+         annual_salary <= 2e6) %>%
+  mutate(state = str_remove(state, ", .*"))
+```
+
+Let's do some basic visualization
+
+```{r}
+survey_usd %>%
+  ggplot(aes(annual_salary)) +
+  geom_histogram() +
+  scale_x_log10(labels = dollar_format()) +
+  labs(x = "Annual")
+```
+
+
+summarize_salary <- function(tbl) {
+  tbl %>%
+    summarize(n = n(),
+              median_salary = median(annual_salary)) %>%
+    arrange(desc(n))
+}
+plot_categorical <- function(tbl, column, n_levels = 9, reorder = TRUE) {
+  lumped_tbl <- tbl %>%
+    filter(!is.na({{ column }})) %>%
+    mutate({{ column }} := fct_lump({{ column }}, n_levels))
+  
+  if (reorder) {
+    lumped_tbl <- lumped_tbl %>%
+      mutate({{ column }} := fct_reorder({{ column }}, annual_salary))
+  }
+  lumped_tbl %>%
+    group_by({{ column }}) %>%
+    summarize_salary() %>%
+    ggplot(aes(median_salary, {{ column }})) +
+    geom_col() +
+    scale_x_continuous(labels = dollar_format()) +
+    labs(x = "Median salary")
+}
+survey_usd %>%
+  plot_categorical(state)
+survey_usd %>%
+  plot_categorical(industry)
+survey_usd %>%
+  plot_categorical(job_title, n_levels = 10)
+survey_usd %>%
+  plot_categorical(experience_overall, reorder = FALSE)
+survey_usd %>%
+  plot_categorical(experience_in_field, reorder = FALSE)
+survey_usd %>%
+  plot_categorical(age_category, reorder = FALSE)
+survey_usd %>%
+  plot_categorical(gender)
+survey_usd %>%
+  plot_categorical(race, n_levels = 4)
+```
+
+
+
+### ANOVA
+
+```{r}
+survey_usd %>%
+  filter(!is.na(experience_overall)) %>%
+  ggplot(aes(annual_salary, experience_overall)) +
+  geom_boxplot() +
+  scale_x_log10()
+library(broom)
+lm(log2(annual_salary) ~ experience_overall, data = survey_usd)
+lm(log2(annual_salary) ~ experience_in_field, data = survey_usd) %>%
+  summary()
+survey_usd %>%
+  mutate(job_title = fct_lump(job_title, 20)) %>%
+  lm(log2(annual_salary) ~ job_title, data = .) %>%
+  summary()
+survey_usd %>%
+  mutate(job_title = fct_lump(job_title, 10),
+         state = fct_lump(state, 10),
+         industry = fct_lump(industry, 10)) %>%
+  lm(log2(annual_salary) ~ job_title + state + city + experience_in_field + gender + race + industry, data = .) %>%
+  anova() %>%
+  tidy() %>%
+  mutate(pct_variation = sumsq / sum(sumsq)) %>%
+  arrange(desc(pct_variation))
+```
+
+
+```{r}
+survey_usd %>%
+  count(overall_years_of_professional_experience, sort = TRUE)
+```
+
+### Modeling
+
+```{r}
+
+set.seed(2021)
+```
