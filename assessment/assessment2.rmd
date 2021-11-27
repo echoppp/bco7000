@@ -13,66 +13,98 @@ Tasks:
 
 See the definition of variables in a separate section “Data dictionary”
 
-To import the data use https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018-11-20/thanksgiving_meals.csv
+To import the data use 
+
+https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-20/thanksgiving_meals.csv
 
 --------
 
 Setup: 5 marks
 
-1. Create a separate R Project for the assignment and call it “Practical assignment”. Please store all your files there.
+1. Use the same (=clone a repository) R Project for the assignment2 as you created for Assignment1. Create a new .rmd document "Assignment2.rmd"
 
 2. Use the provided csv file to complete the tasks below. The file needs to be uploaded to your project. You can use the variable name of your choice.
 
 3.  For each question below record your answer in the markdown document that will show the question, your code and the results.
+Your explanation of the data insights is VERY important as well as your code
 
 -----------
 
-### Part 1: formatting RMarkdown document  (10 marks)
+### Part 1: formatting RMarkdown document  (2 marks)
 
-1. Create an Rmarkdown document with webpage as output (2 marks)
+1. Create an Rmarkdown document with webpage as output (same as in setup)
 
-2: At the start of the output document include your name in italic font and 
-your student id in bold font as level 2 heading (2 marks)
+At the start of the output document include your name in italic font and 
+your student id in bold font as level 2 heading 
 
-Separate with a solid line (1 mark)
+Separate with a solid line 
 
-Include the title “Assignment 1” as level 1 heading (1 mark)
+Include the title “Assignment 2” as level 1 heading 
 
-Separate with a solid line (1 mark)
+Separate with a solid line 
 
-Include an photo of yourself (1 mark)
+List all tasks in the assignment as headings of the third level and include your results (=output) below each task showing your R code. 
 
-3. List all tasks in the assignment as headings of the third level and include your results (=output) below each task showing your R code. (2 marks)
-
-### Part 2: Data Wrangling and visualization (60 Marks)
+### Part 2: Data Wrangling and visualization 38 marks
 
 For all tables below, you need to use the RMarkdown functionality to present tables (`kable`). 
 
-1. Display the first 10 rows of the dataset using RMarkdown (1 marks)
+1. Display the first 10 rows of the dataset using `kable()` function (1 marks). 
 
-2. Use `fct_reorder` and `parse_number` functions to create a factor variable `family_income`
+2. Using `skim()` display the summary of variables. 
 
-3. Generate the general statistics of the dataset using `summary()` and `skim()` function (2 mark).
+Think about the task to predict a family income based on their menu: what variables may be useful? Are all of them correct type? 
+Write 2-3 sentences with your explanation. (2 marks)
 
-4. Wha is the number of people who celebrate?
+Think about the task to predict a community type or US_region based on their menu: what variables may be useful? Are all of them correct type? (2 marks)
 
-5. What are categories and stats for each main dish served and the method it is prepared?
+3. Use `fct_reorder` and `parse_number` functions to create a factor variable `family_income`(2 mark).
 
-6. Create a data viz showing this in the most evident way. Provide your own legend and use themes.
+4. What is the number of people who celebrate? (1 mark)
 
-7. How many use cranberry sauce? How many use gravy?
+5. What are categories and insights for each main dish served and the method it is prepared? (2 marks)
 
-8. What is the distribution of those who celebrate across income ranges
+6. Create 3 different data viz showing insights for main dish served and the method. Provide your own legend and use themes.
+Write 2-3 sentences with your explanation of each insight. (4 marks)
 
-9. Present this information in the most evident way on the data viz.
+7. How many use cranberry sauce? How many use gravy? 2marks
 
-10. What are the most common pies, sides, and desserts?
+8-9. What is the distribution of those who celebrate across income ranges. Create a data viz.
+Write 2-3 sentences with your explanation of each insight. (4 marks)
 
-11. Present this information on a data viz
+10. Use the following code to create a new data set 2 mark
 
-13. How do the servings differ by income?
+`
+select(id, starts_with("side"),
+         starts_with("pie"),
+         starts_with("dessert")) %>%
+  select(-side15, -pie13, -dessert12) %>%
+  gather(type, value, -id) %>%
+  filter(!is.na(value),
+         !value %in% c("None", "Other (please specify)")) %>%
+  mutate(type = str_remove(type, "\\d+"))
+`
 
-14. Present this information on a data viz
+Write 2-3 sentences with your explanation of what it does. (4 marks)
+
+11-12. Intall package `widyr` and use `pairwise_cor()` function https://www.rdocumentation.org/packages/widyr/versions/0.1.3/topics/pairwise_cor
+Write 2-3 sentences with your explanation of what it does. (2 marks)
+
+Use this code for the new dataset
+
+`
+pairwise_cor(value, id, sort = TRUE)
+
+`
+Write 1 sentence with your explanation of what insights it shows. (2 marks)
+
+13. Use `lm()` or randomForest() function to build a model that predict a family income based on data in the dataset. 8 marks
+
+Compare 3 models using different set of input variables. Use different number of variables.
+
+Explain your choice of variables (3 sentences) 
+
+Write 2 sentences explaining which model os best.
 
 #### Resources:
 
