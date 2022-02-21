@@ -1,6 +1,8 @@
 ## Assessment 1:
 
 **Focus**: Basic R, RMarkdown and `tidyverse` data wrangling
+### Part 1. - Due session 4
+
 1. Setup your Assessment 1 project:
 
 - Accept the invitation to work with GitHub classroom and set up this project in your RStudio as shown in class.
@@ -31,6 +33,8 @@ Display the first 10 rows of the dataset and the first 5 variables
 
 Use Help and the link below to read more about those functions  https://bookdown.org/yihui/rmarkdown-cookbook/kable.html 
 
+### Part 2. - Due session 6
+
 8. Display the observations that has more than 1000 calories
 
 9. Arrange observations with more than 40 in total_fat and more than 80 in total_carb in the descending order and save them to a new variable (dataset) called `dont_eat_this`
@@ -59,6 +63,7 @@ Remove the variable `salad`
 
 17. Use observations for Mcdonalds to plot sugar variable against protein with `geom_point()` 
 
+Part 3. - Due session 8
 
 **Focus**: ggplot2, factors, strings, dates  
 
